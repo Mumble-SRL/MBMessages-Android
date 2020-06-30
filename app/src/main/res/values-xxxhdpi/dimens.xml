@@ -1,0 +1,39 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="padding_xx_small">2dp</dimen>
+    <dimen name="padding_x_small">5dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">11dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+    <dimen name="padding_mlarge">20dp</dimen>
+    <dimen name="padding_mmlarge">32dp</dimen>
+    <dimen name="padding_xmlarge">42dp</dimen>
+    <dimen name="padding_xlarge">55dp</dimen>
+    <dimen name="padding_enormous">68dp</dimen>
+    <dimen name="txt_little">8sp</dimen>
+    <dimen name="txt_xnormal">20sp</dimen>
+    <dimen name="txt_normal">17sp</dimen>
+    <dimen name="txt_large">23sp</dimen>
+    <dimen name="txt_mlarge">30sp</dimen>
+    <dimen name="txt_xlarge">38sp</dimen>
+    <dimen name="txt_mid_btn">14.5sp</dimen>
+    <dimen name="txt_mid">13sp</dimen>
+    <dimen name="txt_l_mid">11sp</dimen>
+    <dimen name="drawer_width">130dp</dimen>
+    <dimen name="drawer_width_long">310dp</dimen>
+    <dimen name="divider_height">10dp</dimen>
+    <dimen name="progress_dialog_bar">90dp</dimen>
+    <dimen name="progress_dialog_dimen">160dp</dimen>
+    <dimen name="circle">13dp</dimen>
+    <dimen name="circle_double">36dp</dimen>
+    <dimen name="circle_big">24dp</dimen>
+    <dimen name="circle_enormous">100dp</dimen>
+    <dimen name="indicator_radius">7dp</dimen>
+    <dimen name="btn_like">80dp</dimen>
+    <dimen name="seekbar_thumb">28dp</dimen>
+    <dimen name="half_seekbar_thumb">18dp</dimen>
+
+</resources>

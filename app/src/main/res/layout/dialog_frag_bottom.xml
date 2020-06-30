@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:id="@+id/dfrag_bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="@dimen/padding_large"
+        android:layout_marginEnd="@dimen/padding_large"
+        android:layout_marginBottom="@dimen/padding_small"
+        android:background="@drawable/white_rounded_bg"
+        android:elevation="1dp"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/padding_large"
+        android:paddingEnd="@dimen/padding_large"
+        android:paddingBottom="@dimen/padding_large">
+
+        <RelativeLayout
+            android:id="@+id/dfrag_bottom_drag_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_mmlarge">
+
+            <View
+                android:layout_width="@dimen/padding_enormous"
+                android:layout_height="3dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/grey_line" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/padding_large"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/dfrag_bottom_img"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center_vertical"
+                android:src="@mipmap/ic_launcher" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/dfrag_bottom_txt_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/padding_large"
+                    android:layout_marginEnd="@dimen/padding_large"
+                    android:layout_marginBottom="@dimen/padding_large"
+                    android:text="Lorem Ipsum"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/txt_xnormal"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/dfrag_bottom_txt_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/padding_large"
+                    android:layout_marginEnd="@dimen/padding_large"
+                    android:layout_marginBottom="@dimen/padding_mlarge"
+                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/txt_normal" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dfrag_bottom_btn_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/custom_btn_black"
+                android:gravity="center"
+                android:paddingTop="@dimen/padding_x_small"
+                android:paddingBottom="@dimen/padding_x_small"
+                android:stateListAnimator="@null"
+                android:text="Button 1"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/txt_normal" />
+
+            <Space
+                android:id="@+id/dfrag_bottom_space"
+                android:layout_width="@dimen/padding_medium"
+                android:layout_height="1dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dfrag_bottom_btn_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/custom_btn_white"
+                android:gravity="center"
+                android:paddingTop="@dimen/padding_x_small"
+                android:paddingBottom="@dimen/padding_x_small"
+                android:stateListAnimator="@null"
+                android:text="Button 2"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/txt_normal" />
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>
