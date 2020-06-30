@@ -1,5 +1,6 @@
-package mumble.mbmessages.iam.popups
+package mumble.mbmessages.iam.MBIAMPopups
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -9,9 +10,20 @@ import android.view.ViewGroup
 import android.view.Window
 import com.example.mb_messages.R
 import kotlinx.android.synthetic.main.dialog_frag_center.*
+import mumble.mbmessages.iam.MBIAMData.CampaignIAM
+import mumble.mbmessages.iam.MBMessagesManager
+import mumble.mbmessages.iam.MBMessagesStyler
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
 class DialogFragCenter : androidx.fragment.app.DialogFragment() {
+
+    lateinit var father: MBMessagesManager
+    lateinit var content: CampaignIAM
+
+    fun initialize(father: MBMessagesManager, content: CampaignIAM) {
+        this.father = father
+        this.content = content
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(R.layout.dialog_frag_center, container, false)
@@ -23,7 +35,7 @@ class DialogFragCenter : androidx.fragment.app.DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val dimen = MBCommonMethods.getScreenWidth(requireActivity())/2
+        val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 2
         dfrag_center_img.layoutParams.width = dimen
         dfrag_center_img.layoutParams.height = dimen
 
@@ -38,6 +50,9 @@ class DialogFragCenter : androidx.fragment.app.DialogFragment() {
         dfrag_center_btn_2.setOnClickListener {
             dismiss()
         }
+
+        MBMessagesStyler.putDataInIAM(requireContext(), father, content, dfrag_center_layout, dfrag_center_txt_title,
+                dfrag_center_txt_message, dfrag_center_img, dfrag_center_btn_1, dfrag_center_btn_2, null)
     }
 
     override fun onStart() {
@@ -48,5 +63,11 @@ class DialogFragCenter : androidx.fragment.app.DialogFragment() {
             val height = ViewGroup.LayoutParams.MATCH_PARENT
             dialog.window!!.setLayout(width, height)
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        father.addMessageSeen(content.id, requireContext())
+        father.continueFlow(requireActivity())
     }
 }
