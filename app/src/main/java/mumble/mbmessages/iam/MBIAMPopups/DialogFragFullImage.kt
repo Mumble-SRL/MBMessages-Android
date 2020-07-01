@@ -9,12 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import com.example.mb_messages.R
-import kotlinx.android.synthetic.main.dialog_frag_center.*
+import kotlinx.android.synthetic.main.dialog_frag_fullimage.*
 import mumble.mbmessages.iam.MBIAMData.CampaignIAM
 import mumble.mbmessages.iam.MBMessagesManager
-import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
-class DialogFragCenter : androidx.fragment.app.DialogFragment() {
+class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
 
     lateinit var father: MBMessagesManager
     lateinit var content: CampaignIAM
@@ -25,7 +24,7 @@ class DialogFragCenter : androidx.fragment.app.DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = inflater.inflate(R.layout.dialog_frag_center, container, false)
+        val v = inflater.inflate(R.layout.dialog_frag_fullimage, container, false)
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return v
@@ -34,24 +33,25 @@ class DialogFragCenter : androidx.fragment.app.DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 2
-        dfrag_center_img.layoutParams.width = dimen
-        dfrag_center_img.layoutParams.height = dimen
+        val imageSizeArr = father.getImageSize(requireActivity(), content.id.toString())
+        dfrag_fullimage_layout.layoutParams.width = imageSizeArr[0]
+        dfrag_fullimage_layout.layoutParams.height = imageSizeArr[1]
 
-        dfrag_center_close.setOnClickListener {
+        dfrag_fullimage_close.setOnClickListener {
             dismiss()
         }
 
-        dfrag_center_btn_1.setOnClickListener {
+        dfrag_fullimage_btn_1.setOnClickListener {
             father.setClick(requireActivity(), this, content.cta1)
         }
 
-        dfrag_center_btn_2.setOnClickListener {
+        dfrag_fullimage_btn_2.setOnClickListener {
             father.setClick(requireActivity(), this, content.cta2)
         }
 
-        father.putDataInIAM(requireContext(), content, dfrag_center_layout, dfrag_center_txt_title,
-                dfrag_center_txt_message, dfrag_center_img, dfrag_center_btn_1, dfrag_center_btn_2, null, dfrag_center_close)
+        father.putDataInIAM(requireContext(), content, dfrag_fullimage_layout, null, null,
+                dfrag_fullimage_img, dfrag_fullimage_btn_1, dfrag_fullimage_btn_2, null,
+                dfrag_fullimage_close)
     }
 
     override fun onStart() {

@@ -13,9 +13,7 @@ import androidx.fragment.app.DialogFragment
 import com.example.mb_messages.R
 import kotlinx.android.synthetic.main.dialog_frag_top.*
 import mumble.mbmessages.iam.MBIAMData.CampaignIAM
-import mumble.mbmessages.iam.MBMessages
 import mumble.mbmessages.iam.MBMessagesManager
-import mumble.mbmessages.iam.MBMessagesStyler
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
 class DialogFragTop : DialogFragment() {
@@ -23,8 +21,9 @@ class DialogFragTop : DialogFragment() {
     lateinit var father: MBMessagesManager
     lateinit var content: CampaignIAM
 
+    var clickListener: MBMessagesManager.MNBIAMClickListener? = null
+
     var i = 0
-    var x = -1f
     var y = -1f
     var downPoint = -1f
 
@@ -52,15 +51,15 @@ class DialogFragTop : DialogFragment() {
         dfrag_top_img.layoutParams.height = dimen
 
         dfrag_top_btn_1.setOnClickListener {
-            dismiss()
+            father.setClick(requireActivity(), this, content.cta1)
         }
 
         dfrag_top_btn_2.setOnClickListener {
-            dismiss()
+            father.setClick(requireActivity(), this, content.cta2)
         }
 
-        MBMessagesStyler.putDataInIAM(requireContext(), father, content, dfrag_top_layout, dfrag_top_txt_title,
-                dfrag_top_txt_message, dfrag_top_img, dfrag_top_btn_1, dfrag_top_btn_2, dfrag_top_space)
+        father.putDataInIAM(requireContext(), content, dfrag_top_layout, dfrag_top_txt_title,
+                dfrag_top_txt_message, dfrag_top_img, dfrag_top_btn_1, dfrag_top_btn_2, dfrag_top_space, null)
 
         setLayout()
     }

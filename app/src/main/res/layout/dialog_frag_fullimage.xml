@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/dfrag_fullimage_black"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_very_alpha"
+        android:clickable="true"
+        android:importantForAccessibility="no" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="@dimen/padding_large"
+        app:cardBackgroundColor="@android:color/white"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="1dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:id="@+id/dfrag_fullimage_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/dfrag_fullimage_img"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/dfrag_fullimage_close"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="end"
+                android:layout_margin="@dimen/padding_large"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="@dimen/padding_small"
+                app:srcCompat="@drawable/icon_close" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical"
+                android:padding="@dimen/padding_large">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/dfrag_fullimage_btn_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/padding_large"
+                    android:layout_marginEnd="@dimen/padding_large"
+                    android:layout_marginBottom="@dimen/padding_medium"
+                    android:background="@drawable/custom_btn_black"
+                    android:gravity="center"
+                    android:paddingTop="@dimen/padding_x_small"
+                    android:paddingBottom="@dimen/padding_x_small"
+                    android:stateListAnimator="@null"
+                    android:text="Button 1"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/txt_normal" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/dfrag_fullimage_btn_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/padding_large"
+                    android:layout_marginEnd="@dimen/padding_large"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:background="@drawable/custom_btn_white"
+                    android:gravity="center"
+                    android:paddingTop="@dimen/padding_x_small"
+                    android:paddingBottom="@dimen/padding_x_small"
+                    android:stateListAnimator="@null"
+                    android:text="Button 2"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/txt_normal" />
+            </LinearLayout>
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+</RelativeLayout>

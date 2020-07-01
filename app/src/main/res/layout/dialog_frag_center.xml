@@ -36,8 +36,9 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/dfrag_center_close"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:padding="@dimen/padding_small"
                 android:layout_alignParentEnd="true"
                 android:clickable="true"
                 android:focusable="true"
