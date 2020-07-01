@@ -12,6 +12,7 @@ import com.example.mb_messages.R
 import kotlinx.android.synthetic.main.dialog_frag_center.*
 import mumble.mbmessages.iam.MBIAMData.CampaignIAM
 import mumble.mbmessages.iam.MBMessagesManager
+import mumble.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
 class DialogFragCenter : androidx.fragment.app.DialogFragment() {
@@ -43,15 +44,17 @@ class DialogFragCenter : androidx.fragment.app.DialogFragment() {
         }
 
         dfrag_center_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1)
+            father.setClick(requireActivity(), this, content.cta1, content.id.toString())
         }
 
         dfrag_center_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2)
+            father.setClick(requireActivity(), this, content.cta2, content.id.toString())
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_center_layout, dfrag_center_txt_title,
                 dfrag_center_txt_message, dfrag_center_img, dfrag_center_btn_1, dfrag_center_btn_2, null, dfrag_center_close)
+
+        MBMessagesMetrics.trackShowMessage(requireContext(), content.id.toString())
     }
 
     override fun onStart() {

@@ -15,6 +15,7 @@ import com.example.mb_messages.R
 import kotlinx.android.synthetic.main.dialog_frag_bottom.*
 import mumble.mbmessages.iam.MBIAMData.CampaignIAM
 import mumble.mbmessages.iam.MBMessagesManager
+import mumble.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
 class DialogFragBottom : DialogFragment() {
@@ -50,17 +51,19 @@ class DialogFragBottom : DialogFragment() {
         dfrag_bottom_img.layoutParams.height = dimen
 
         dfrag_bottom_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1)
+            father.setClick(requireActivity(), this, content.cta1, content.id.toString())
         }
 
         dfrag_bottom_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2)
+            father.setClick(requireActivity(), this, content.cta2, content.id.toString())
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_bottom_layout, dfrag_bottom_txt_title,
                 dfrag_bottom_txt_message, dfrag_bottom_img, dfrag_bottom_btn_1, dfrag_bottom_btn_2, dfrag_bottom_space, null)
 
         setLayout()
+
+        MBMessagesMetrics.trackShowMessage(requireContext(), content.id.toString())
     }
 
     override fun onStart() {

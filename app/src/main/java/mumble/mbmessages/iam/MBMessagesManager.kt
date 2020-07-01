@@ -29,6 +29,7 @@ import mumble.mbmessages.iam.MBIAMPopups.DialogFragBottom
 import mumble.mbmessages.iam.MBIAMPopups.DialogFragCenter
 import mumble.mbmessages.iam.MBIAMPopups.DialogFragFullImage
 import mumble.mbmessages.iam.MBIAMPopups.DialogFragTop
+import mumble.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 import org.json.JSONArray
 import java.io.File
@@ -383,21 +384,26 @@ class MBMessagesManager {
         return sArray
     }
 
-    fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?) {
-        if (cta != null) {
-            if (cta.action_type == MBIAMConstants.ACTION_LINK) {
-                try {
-                    val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(cta.action))
-                    activity.startActivity(intent)
-                } catch (exception: ActivityNotFoundException) {
-                    Log.d("MBMessages", "Activity not found for handling content")
+    fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?, message_id: String) {
+        val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+        if (!activity.isFinishing && isActivityInForeground) {
+            if (cta != null) {
+                if (cta.action_type == MBIAMConstants.ACTION_LINK) {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(cta.action))
+                        activity.startActivity(intent)
+                    } catch (exception: ActivityNotFoundException) {
+                        Log.d("MBMessages", "Activity not found for handling content")
+                    }
+                } else {
+                    clickListener?.onCTAClicked(cta)
                 }
-            } else {
-                clickListener?.onCTAClicked(cta)
             }
-        }
 
-        fragDialog.dismiss()
+            MBMessagesMetrics.trackInteractionMessage(activity.applicationContext, message_id)
+
+            fragDialog.dismiss()
+        }
     }
 
     interface MNBIAMClickListener {
