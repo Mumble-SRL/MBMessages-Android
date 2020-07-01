@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import mumble.mbmessages.iam.MBIAMConstants.MBIAMAPIConstants
+import mumble.mbmessages.iam.MBIAMData.Campaign
 import mumble.mbmessages.iam.MBIAMResultsListener.MBIAMCampaignListener
+import mumble.mbmessages.iam.MBMessagesParser
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBAMActivityUtils
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBAPIManager4
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBApiManagerConfig
@@ -37,6 +39,8 @@ class MBIAMAsyncTask_getCampaign : AsyncTask<Void, Void, Void> {
      * If you wish to use a listener to retrieve the data
      */
     private var listener: MBIAMCampaignListener? = null
+
+    lateinit var campaigns: ArrayList<Campaign>
 
     private var result = MBApiManagerConfig.COMMON_INTERNAL_ERROR
     private var error: String? = null
@@ -86,6 +90,8 @@ class MBIAMAsyncTask_getCampaign : AsyncTask<Void, Void, Void> {
         } else {
             if (error != null) {
                 listener!!.onCampaignError(error!!)
+            } else {
+                listener!!.onCampaignObtained(campaigns)
             }
         }
     }
@@ -99,7 +105,8 @@ class MBIAMAsyncTask_getCampaign : AsyncTask<Void, Void, Void> {
     fun getPayload(sPayload: String) {
         try {
             val jPayload = JSONObject(sPayload)
-            val jBody = jPayload.getJSONObject("body")
+            val jBody = jPayload.getJSONArray("body")
+            campaigns = MBMessagesParser.parseCampaigns(weakContext.get()!!, jBody)
         } catch (e: JSONException) {
             e.printStackTrace()
         }
