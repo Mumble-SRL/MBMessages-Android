@@ -34,7 +34,7 @@ class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val imageSizeArr = father.getImageSize(requireActivity(), content.id.toString())
+        val imageSizeArr = father.getImageSizeFullScreen(requireActivity(), content.id.toString())
         dfrag_fullimage_layout.layoutParams.width = imageSizeArr[0]
         dfrag_fullimage_layout.layoutParams.height = imageSizeArr[1]
 

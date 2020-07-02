@@ -47,9 +47,12 @@ class DialogFragTop : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 6
+        val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 5
         dfrag_top_img.layoutParams.width = dimen
         dfrag_top_img.layoutParams.height = dimen
+
+        val dragDimen = MBCommonMethods.getScreenWidth(requireActivity())/10
+        dfrag_top_drag_layout.layoutParams.height = dragDimen
 
         dfrag_top_btn_1.setOnClickListener {
             father.setClick(requireActivity(), this, content.cta1, content.id.toString())
@@ -87,7 +90,7 @@ class DialogFragTop : DialogFragment() {
     }
 
     fun hideUp() {
-        val va = ValueAnimator.ofFloat(dfrag_top_layout.y, -dfrag_top_layout.height.toFloat())
+        val va = ValueAnimator.ofFloat(dfrag_top_whole_layout.y, -dfrag_top_whole_layout.height.toFloat())
         val mDuration = 300
         va.duration = mDuration.toLong()
         va.interpolator = DecelerateInterpolator()
@@ -102,12 +105,12 @@ class DialogFragTop : DialogFragment() {
             override fun onAnimationCancel(animation: Animator) {}
             override fun onAnimationRepeat(animation: Animator) {}
         })
-        va.addUpdateListener { animation -> dfrag_top_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge) * 2) }
+        va.addUpdateListener { animation -> dfrag_top_whole_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge) * 2) }
         va.start()
     }
 
     fun returnDown() {
-        val va = ValueAnimator.ofFloat(dfrag_top_layout.y, resources.getDimensionPixelSize(R.dimen.padding_small).toFloat())
+        val va = ValueAnimator.ofFloat(dfrag_top_whole_layout.y, resources.getDimensionPixelSize(R.dimen.padding_small).toFloat())
         val mDuration = 300
         va.duration = mDuration.toLong()
         va.interpolator = AccelerateDecelerateInterpolator()
@@ -121,7 +124,7 @@ class DialogFragTop : DialogFragment() {
             override fun onAnimationCancel(animation: Animator) {}
             override fun onAnimationRepeat(animation: Animator) {}
         })
-        va.addUpdateListener { animation -> dfrag_top_layout.y = animation.animatedValue as Float }
+        va.addUpdateListener { animation -> dfrag_top_whole_layout.y = animation.animatedValue as Float }
         va.start()
     }
 
@@ -140,7 +143,7 @@ class DialogFragTop : DialogFragment() {
                         val diff = downPoint - y
                         downPoint = y
                         if (event.action == MotionEvent.ACTION_MOVE) {
-                            dfrag_top_layout.y = dfrag_top_layout.y - diff
+                            dfrag_top_whole_layout.y = dfrag_top_whole_layout.y - diff
                         }
 
                         if (++i > 50) {
@@ -169,7 +172,7 @@ class DialogFragTop : DialogFragment() {
 
         dfrag_top_drag_layout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                highestPoint = (MBCommonMethods.getStatusBarHeight(requireActivity()) + dfrag_top_layout.height + resources.getDimensionPixelSize(R.dimen.padding_small)).toFloat()
+                highestPoint = (MBCommonMethods.getStatusBarHeight(requireActivity()) + dfrag_top_whole_layout.height + resources.getDimensionPixelSize(R.dimen.padding_small)).toFloat()
                 threshold = highestPoint / 2.5f
                 dfrag_top_drag_layout.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }

@@ -64,6 +64,9 @@ class MBMessagesManager {
     /**Int Color reference to tint the close button**/
     var closeButtonColor: Int? = null
 
+    /**Int Color reference to tint the close button**/
+    var closeButtonBackgroundColor: Int? = null
+
     /**Int Color reference for the first button background**/
     var button1BackgroundColor: Int? = null
 
@@ -208,6 +211,10 @@ class MBMessagesManager {
             content.closeButtonColor = closeButtonColor!!
         }
 
+        if (closeButtonBackgroundColor != null) {
+            content.closeButtonBGColor = closeButtonBackgroundColor!!
+        }
+
         if (button1BackgroundColor != null) {
             if (content.cta1 != null) {
                 content.cta1!!.background_color = button1BackgroundColor!!
@@ -339,6 +346,10 @@ class MBMessagesManager {
         if ((closeButtonColor != null) && (closeBtn != null)) {
             ImageViewCompat.setImageTintList(closeBtn, ColorStateList.valueOf(closeButtonColor!!))
         }
+
+        if ((closeButtonBackgroundColor != null) && (closeBtn != null)) {
+            ViewCompat.setBackgroundTintList(closeBtn, ColorStateList.valueOf(closeButtonBackgroundColor!!))
+        }
     }
 
     fun setImageFromMemory(context: Context, id: String, image: AppCompatImageView) {
@@ -353,7 +364,7 @@ class MBMessagesManager {
         }
     }
 
-    fun getImageSize(act: FragmentActivity, id: String): Array<Int> {
+    fun getImageSizeFullScreen(act: FragmentActivity, id: String): Array<Int> {
         val sArray = arrayOf(0, 0)
         val isActivityInForeground = act.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
         if (!act.isFinishing && isActivityInForeground) {
@@ -372,6 +383,36 @@ class MBMessagesManager {
                 val margins = act.resources.getDimensionPixelSize(R.dimen.padding_large) * 2
                 val resultWidth = MBCommonMethods.getScreenWidth(act) - margins
                 val resultHeight = ((resultWidth.toFloat() * imageHeight.toFloat()) / imageWidth.toFloat()).toInt()
+                sArray[0] = resultWidth
+                sArray[1] = resultHeight
+            } else {
+                val dimen = MBCommonMethods.getScreenWidth(act) / 2
+                sArray[0] = dimen
+                sArray[1] = dimen
+            }
+        }
+
+        return sArray
+    }
+
+    fun getImageSizeCenter(act: FragmentActivity, id: String): Array<Int> {
+        val sArray = arrayOf(0, 0)
+        val isActivityInForeground = act.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+        if (!act.isFinishing && isActivityInForeground) {
+            val extStorage = act.getExternalFilesDir(null)
+            if (!extStorage!!.exists()) {
+                extStorage.mkdirs()
+            }
+
+            val imgFile = File(extStorage, "%s.jpg".format(id))
+            if (imgFile.exists()) {
+                val options = BitmapFactory.Options()
+                options.inJustDecodeBounds = true
+                BitmapFactory.decodeFile(imgFile.absolutePath, options)
+                val imageWidth = options.outWidth
+                val imageHeight = options.outHeight
+                val resultHeight = MBCommonMethods.getScreenWidth(act) / 3
+                val resultWidth = ((imageWidth.toFloat() * resultHeight.toFloat()) / imageHeight.toFloat()).toInt()
                 sArray[0] = resultWidth
                 sArray[1] = resultHeight
             } else {

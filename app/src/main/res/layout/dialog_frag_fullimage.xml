@@ -19,7 +19,7 @@
         android:layout_margin="@dimen/padding_large"
         app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="10dp"
-        app:cardElevation="1dp"
+        app:cardElevation="2dp"
         app:cardUseCompatPadding="true">
 
         <RelativeLayout
@@ -60,7 +60,7 @@
                     android:layout_marginStart="@dimen/padding_large"
                     android:layout_marginEnd="@dimen/padding_large"
                     android:layout_marginBottom="@dimen/padding_medium"
-                    android:background="@drawable/custom_btn_black"
+                    android:background="@drawable/custom_btn_mburger"
                     android:gravity="center"
                     android:paddingTop="@dimen/padding_x_small"
                     android:paddingBottom="@dimen/padding_x_small"
@@ -76,13 +76,13 @@
                     android:layout_marginStart="@dimen/padding_large"
                     android:layout_marginEnd="@dimen/padding_large"
                     android:layout_marginBottom="@dimen/padding_small"
-                    android:background="@drawable/custom_btn_white"
+                    android:background="@drawable/custom_btn_trasp_stroke_mburger"
                     android:gravity="center"
                     android:paddingTop="@dimen/padding_x_small"
                     android:paddingBottom="@dimen/padding_x_small"
                     android:stateListAnimator="@null"
                     android:text="Button 2"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/mburger_color"
                     android:textSize="@dimen/txt_normal" />
             </LinearLayout>
         </RelativeLayout>

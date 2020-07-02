@@ -11,6 +11,7 @@ class CampaignIAM(
         var content_color: Int?,
         var backgroundColor: Int?,
         var closeButtonColor: Int? = null,
+        var closeButtonBGColor: Int? = null,
         var cta1: CTA? = null,
         var cta2: CTA? = null,
         var durationInSeconds: Int,

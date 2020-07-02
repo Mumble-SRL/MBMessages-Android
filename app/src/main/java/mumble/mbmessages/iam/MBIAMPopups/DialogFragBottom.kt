@@ -46,9 +46,12 @@ class DialogFragBottom : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 6
+        val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 5
         dfrag_bottom_img.layoutParams.width = dimen
         dfrag_bottom_img.layoutParams.height = dimen
+
+        val dragDimen = MBCommonMethods.getScreenWidth(requireActivity()) / 10
+        dfrag_bottom_drag_layout.layoutParams.height = dragDimen
 
         dfrag_bottom_btn_1.setOnClickListener {
             father.setClick(requireActivity(), this, content.cta1, content.id.toString())
@@ -101,7 +104,7 @@ class DialogFragBottom : DialogFragment() {
             override fun onAnimationCancel(animation: Animator) {}
             override fun onAnimationRepeat(animation: Animator) {}
         })
-        va.addUpdateListener { animation -> dfrag_bottom_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge)) }
+        va.addUpdateListener { animation -> dfrag_bottom_whole_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge)) }
         va.start()
     }
 
@@ -120,7 +123,7 @@ class DialogFragBottom : DialogFragment() {
             override fun onAnimationCancel(animation: Animator) {}
             override fun onAnimationRepeat(animation: Animator) {}
         })
-        va.addUpdateListener { animation -> dfrag_bottom_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge)) }
+        va.addUpdateListener { animation -> dfrag_bottom_whole_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge)) }
         va.start()
     }
 
@@ -132,7 +135,7 @@ class DialogFragBottom : DialogFragment() {
                     if (tmpY > highestPoint) {
                         y = tmpY
                         if (event.action == MotionEvent.ACTION_MOVE) {
-                            dfrag_bottom_layout.y = (y - resources.getDimensionPixelSize(R.dimen.padding_mmlarge) * 2)
+                            dfrag_bottom_whole_layout.y = (y - resources.getDimensionPixelSize(R.dimen.padding_mmlarge) * 2)
                         }
 
                         if (++i > 50) {
@@ -161,8 +164,8 @@ class DialogFragBottom : DialogFragment() {
 
         dfrag_bottom_drag_layout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                highestPoint = dfrag_bottom_layout.y + resources.getDimensionPixelSize(R.dimen.padding_mmlarge)
-                threshold = highestPoint + (dfrag_bottom_layout.height / 2)
+                highestPoint = dfrag_bottom_whole_layout.y + resources.getDimensionPixelSize(R.dimen.padding_mmlarge)
+                threshold = highestPoint + (dfrag_bottom_whole_layout.height / 2)
                 dfrag_bottom_drag_layout.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })

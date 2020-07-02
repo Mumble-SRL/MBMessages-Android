@@ -2,5 +2,7 @@
 <resources>
     <color name="black_very_alpha">#44000000</color>
     <color name="gray_light">#ececec</color>
-    <color name="gray_dark">#38383b</color>
+    <color name="gray_dark">#d6d6d6</color>
+    <color name="mburger_color">#138CFC</color>
+    <color name="mburger_color_h">#0f70c9</color>
 </resources>
