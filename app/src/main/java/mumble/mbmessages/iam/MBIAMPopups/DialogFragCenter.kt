@@ -10,8 +10,10 @@ import android.view.ViewGroup
 import android.view.Window
 import com.example.mb_messages.R
 import kotlinx.android.synthetic.main.dialog_frag_center.*
+import kotlinx.android.synthetic.main.dialog_frag_fullimage.*
 import mumble.mbmessages.iam.MBIAMData.CampaignIAM
 import mumble.mbmessages.iam.MBMessagesManager
+import mumble.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
 class DialogFragCenter : androidx.fragment.app.DialogFragment() {
@@ -34,24 +36,26 @@ class DialogFragCenter : androidx.fragment.app.DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 2
-        dfrag_center_img.layoutParams.width = dimen
-        dfrag_center_img.layoutParams.height = dimen
+        val imageSizeArr = father.getImageSizeCenter(requireActivity(), content.id.toString())
+        dfrag_center_img.layoutParams.width = imageSizeArr[0]
+        dfrag_center_img.layoutParams.height = imageSizeArr[1]
 
         dfrag_center_close.setOnClickListener {
             dismiss()
         }
 
         dfrag_center_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1)
+            father.setClick(requireActivity(), this, content.cta1, content.id.toString())
         }
 
         dfrag_center_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2)
+            father.setClick(requireActivity(), this, content.cta2, content.id.toString())
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_center_layout, dfrag_center_txt_title,
                 dfrag_center_txt_message, dfrag_center_img, dfrag_center_btn_1, dfrag_center_btn_2, null, dfrag_center_close)
+
+        MBMessagesMetrics.trackShowMessage(requireContext(), content.id.toString())
     }
 
     override fun onStart() {

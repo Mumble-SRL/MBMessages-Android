@@ -15,6 +15,7 @@ import com.example.mb_messages.R
 import kotlinx.android.synthetic.main.dialog_frag_bottom.*
 import mumble.mbmessages.iam.MBIAMData.CampaignIAM
 import mumble.mbmessages.iam.MBMessagesManager
+import mumble.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
 class DialogFragBottom : DialogFragment() {
@@ -45,22 +46,27 @@ class DialogFragBottom : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 6
+        val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 5
         dfrag_bottom_img.layoutParams.width = dimen
         dfrag_bottom_img.layoutParams.height = dimen
 
+        val dragDimen = MBCommonMethods.getScreenWidth(requireActivity()) / 10
+        dfrag_bottom_drag_layout.layoutParams.height = dragDimen
+
         dfrag_bottom_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1)
+            father.setClick(requireActivity(), this, content.cta1, content.id.toString())
         }
 
         dfrag_bottom_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2)
+            father.setClick(requireActivity(), this, content.cta2, content.id.toString())
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_bottom_layout, dfrag_bottom_txt_title,
                 dfrag_bottom_txt_message, dfrag_bottom_img, dfrag_bottom_btn_1, dfrag_bottom_btn_2, dfrag_bottom_space, null)
 
         setLayout()
+
+        MBMessagesMetrics.trackShowMessage(requireContext(), content.id.toString())
     }
 
     override fun onStart() {
@@ -98,7 +104,7 @@ class DialogFragBottom : DialogFragment() {
             override fun onAnimationCancel(animation: Animator) {}
             override fun onAnimationRepeat(animation: Animator) {}
         })
-        va.addUpdateListener { animation -> dfrag_bottom_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge)) }
+        va.addUpdateListener { animation -> dfrag_bottom_whole_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge)) }
         va.start()
     }
 
@@ -117,7 +123,7 @@ class DialogFragBottom : DialogFragment() {
             override fun onAnimationCancel(animation: Animator) {}
             override fun onAnimationRepeat(animation: Animator) {}
         })
-        va.addUpdateListener { animation -> dfrag_bottom_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge)) }
+        va.addUpdateListener { animation -> dfrag_bottom_whole_layout.y = ((animation.animatedValue as Float) - resources.getDimensionPixelSize(R.dimen.padding_mmlarge)) }
         va.start()
     }
 
@@ -129,7 +135,7 @@ class DialogFragBottom : DialogFragment() {
                     if (tmpY > highestPoint) {
                         y = tmpY
                         if (event.action == MotionEvent.ACTION_MOVE) {
-                            dfrag_bottom_layout.y = (y - resources.getDimensionPixelSize(R.dimen.padding_mmlarge) * 2)
+                            dfrag_bottom_whole_layout.y = (y - resources.getDimensionPixelSize(R.dimen.padding_mmlarge) * 2)
                         }
 
                         if (++i > 50) {
@@ -158,8 +164,8 @@ class DialogFragBottom : DialogFragment() {
 
         dfrag_bottom_drag_layout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                highestPoint = dfrag_bottom_layout.y + resources.getDimensionPixelSize(R.dimen.padding_mmlarge)
-                threshold = highestPoint + (dfrag_bottom_layout.height / 2)
+                highestPoint = dfrag_bottom_whole_layout.y + resources.getDimensionPixelSize(R.dimen.padding_mmlarge)
+                threshold = highestPoint + (dfrag_bottom_whole_layout.height / 2)
                 dfrag_bottom_drag_layout.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })

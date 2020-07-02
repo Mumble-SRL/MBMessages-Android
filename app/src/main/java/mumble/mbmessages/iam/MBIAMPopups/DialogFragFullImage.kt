@@ -12,6 +12,7 @@ import com.example.mb_messages.R
 import kotlinx.android.synthetic.main.dialog_frag_fullimage.*
 import mumble.mbmessages.iam.MBIAMData.CampaignIAM
 import mumble.mbmessages.iam.MBMessagesManager
+import mumble.mbmessages.metrics.MBMessagesMetrics
 
 class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
 
@@ -33,7 +34,7 @@ class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val imageSizeArr = father.getImageSize(requireActivity(), content.id.toString())
+        val imageSizeArr = father.getImageSizeFullScreen(requireActivity(), content.id.toString())
         dfrag_fullimage_layout.layoutParams.width = imageSizeArr[0]
         dfrag_fullimage_layout.layoutParams.height = imageSizeArr[1]
 
@@ -42,16 +43,18 @@ class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
         }
 
         dfrag_fullimage_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1)
+            father.setClick(requireActivity(), this, content.cta1, content.id.toString())
         }
 
         dfrag_fullimage_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2)
+            father.setClick(requireActivity(), this, content.cta2, content.id.toString())
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_fullimage_layout, null, null,
                 dfrag_fullimage_img, dfrag_fullimage_btn_1, dfrag_fullimage_btn_2, null,
                 dfrag_fullimage_close)
+
+        MBMessagesMetrics.trackShowMessage(requireContext(), content.id.toString())
     }
 
     override fun onStart() {

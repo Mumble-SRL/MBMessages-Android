@@ -218,7 +218,7 @@ class MBMessagesParser {
                 e.printStackTrace()
             }
 
-            return CampaignIAM(id, type, title, content, title_color, content_color, backgroundColor,
+            return CampaignIAM(id, type, title, content, title_color, content_color, backgroundColor, null,
                     null, cta1, cta2, durationInSeconds, expiresAt, image)
         }
 

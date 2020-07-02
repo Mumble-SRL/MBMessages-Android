@@ -29,6 +29,7 @@ import mumble.mbmessages.iam.MBIAMPopups.DialogFragBottom
 import mumble.mbmessages.iam.MBIAMPopups.DialogFragCenter
 import mumble.mbmessages.iam.MBIAMPopups.DialogFragFullImage
 import mumble.mbmessages.iam.MBIAMPopups.DialogFragTop
+import mumble.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 import org.json.JSONArray
 import java.io.File
@@ -62,6 +63,9 @@ class MBMessagesManager {
 
     /**Int Color reference to tint the close button**/
     var closeButtonColor: Int? = null
+
+    /**Int Color reference to tint the close button**/
+    var closeButtonBackgroundColor: Int? = null
 
     /**Int Color reference for the first button background**/
     var button1BackgroundColor: Int? = null
@@ -207,6 +211,10 @@ class MBMessagesManager {
             content.closeButtonColor = closeButtonColor!!
         }
 
+        if (closeButtonBackgroundColor != null) {
+            content.closeButtonBGColor = closeButtonBackgroundColor!!
+        }
+
         if (button1BackgroundColor != null) {
             if (content.cta1 != null) {
                 content.cta1!!.background_color = button1BackgroundColor!!
@@ -338,6 +346,10 @@ class MBMessagesManager {
         if ((closeButtonColor != null) && (closeBtn != null)) {
             ImageViewCompat.setImageTintList(closeBtn, ColorStateList.valueOf(closeButtonColor!!))
         }
+
+        if ((closeButtonBackgroundColor != null) && (closeBtn != null)) {
+            ViewCompat.setBackgroundTintList(closeBtn, ColorStateList.valueOf(closeButtonBackgroundColor!!))
+        }
     }
 
     fun setImageFromMemory(context: Context, id: String, image: AppCompatImageView) {
@@ -352,7 +364,7 @@ class MBMessagesManager {
         }
     }
 
-    fun getImageSize(act: FragmentActivity, id: String): Array<Int> {
+    fun getImageSizeFullScreen(act: FragmentActivity, id: String): Array<Int> {
         val sArray = arrayOf(0, 0)
         val isActivityInForeground = act.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
         if (!act.isFinishing && isActivityInForeground) {
@@ -383,21 +395,56 @@ class MBMessagesManager {
         return sArray
     }
 
-    fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?) {
-        if (cta != null) {
-            if (cta.action_type == MBIAMConstants.ACTION_LINK) {
-                try {
-                    val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(cta.action))
-                    activity.startActivity(intent)
-                } catch (exception: ActivityNotFoundException) {
-                    Log.d("MBMessages", "Activity not found for handling content")
-                }
+    fun getImageSizeCenter(act: FragmentActivity, id: String): Array<Int> {
+        val sArray = arrayOf(0, 0)
+        val isActivityInForeground = act.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+        if (!act.isFinishing && isActivityInForeground) {
+            val extStorage = act.getExternalFilesDir(null)
+            if (!extStorage!!.exists()) {
+                extStorage.mkdirs()
+            }
+
+            val imgFile = File(extStorage, "%s.jpg".format(id))
+            if (imgFile.exists()) {
+                val options = BitmapFactory.Options()
+                options.inJustDecodeBounds = true
+                BitmapFactory.decodeFile(imgFile.absolutePath, options)
+                val imageWidth = options.outWidth
+                val imageHeight = options.outHeight
+                val resultHeight = MBCommonMethods.getScreenWidth(act) / 3
+                val resultWidth = ((imageWidth.toFloat() * resultHeight.toFloat()) / imageHeight.toFloat()).toInt()
+                sArray[0] = resultWidth
+                sArray[1] = resultHeight
             } else {
-                clickListener?.onCTAClicked(cta)
+                val dimen = MBCommonMethods.getScreenWidth(act) / 2
+                sArray[0] = dimen
+                sArray[1] = dimen
             }
         }
 
-        fragDialog.dismiss()
+        return sArray
+    }
+
+    fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?, message_id: String) {
+        val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+        if (!activity.isFinishing && isActivityInForeground) {
+            if (cta != null) {
+                if (cta.action_type == MBIAMConstants.ACTION_LINK) {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(cta.action))
+                        activity.startActivity(intent)
+                    } catch (exception: ActivityNotFoundException) {
+                        Log.d("MBMessages", "Activity not found for handling content")
+                    }
+                } else {
+                    clickListener?.onCTAClicked(cta)
+                }
+            }
+
+            MBMessagesMetrics.trackInteractionMessage(activity.applicationContext, message_id)
+
+            fragDialog.dismiss()
+        }
     }
 
     interface MNBIAMClickListener {
