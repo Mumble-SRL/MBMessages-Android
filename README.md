@@ -25,7 +25,7 @@ implementation 'mumble.mburger:android_kt:0.5.0'
 Lastly add `MBMessages` library:
 
 ```
-implementation 'mumble.mburger:mbmessages-android:0.3.0'
+implementation 'mumble.mburger:mbmessages-android:0.3.1'
 ```
 
 
