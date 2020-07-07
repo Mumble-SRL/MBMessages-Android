@@ -61,7 +61,7 @@
                     android:layout_marginBottom="@dimen/padding_large"
                     android:orientation="horizontal">
 
-                    <mumble.mbmessages.iam.RoundedImageView
+                    <mumble.mburger.mbmessages.iam.RoundedImageView
                         android:id="@+id/dfrag_bottom_img"
                         android:layout_width="80dp"
                         android:layout_height="80dp"

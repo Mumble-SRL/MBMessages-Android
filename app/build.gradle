@@ -17,7 +17,7 @@ ext {
     siteUrl = 'https://github.com/Mumble-SRL/MBMessages-Android'
     gitUrl = 'https://github.com/Mumble-SRL/MBMessages-Android.git'
 
-    libraryVersion = '0.3.4'
+    libraryVersion = '0.3.6'
 
     developerId = 'MBurger-Android'
     developerName = 'Mumble'
@@ -34,8 +34,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 54
-        versionName "0.3.4"
+        versionCode 56
+        versionName "0.3.6"
         vectorDrawables.useSupportLibrary = true
     }
 
