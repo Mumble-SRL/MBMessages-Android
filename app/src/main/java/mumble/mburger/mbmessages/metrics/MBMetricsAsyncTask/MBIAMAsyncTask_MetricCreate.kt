@@ -74,7 +74,7 @@ class MBIAMAsyncTask_MetricCreate : AsyncTask<Void, Void, Void> {
         }
 
         if (message_id != null) {
-            values.put("message_id", message_id)
+            values.put("inapp_id", message_id)
         }
 
         map = MBAPIManager4.callApi(weakContext.get()!!, MBIAMAPIConstants.API_CREATE_METRICS, values,

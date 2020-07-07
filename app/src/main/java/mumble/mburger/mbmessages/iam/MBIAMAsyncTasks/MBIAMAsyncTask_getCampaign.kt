@@ -98,7 +98,7 @@ class MBIAMAsyncTask_getCampaign : AsyncTask<Void, Void, Void> {
 
     fun putValuesAndCall() {
         val values = ContentValues()
-        map = MBAPIManager4.callApi(weakContext.get()!!, MBIAMAPIConstants.API_GET_CAMPAIGNS, values,
+        map = MBAPIManager4.callApi(weakContext.get()!!, MBIAMAPIConstants.API_GET_MESSAGES, values,
                 MBApiManagerConfig.MODE_GET, true, false)
     }
 
