@@ -11,12 +11,12 @@ import mumble.mburger.sdk.kt.Common.MBCommonMethods
 import java.lang.ref.WeakReference
 
 /**
- * Task which returns the messages in the app, those are also shown automatically or manually
+ * Task which create metrics associated with push notifications and iam
  *
  * @author Enrico Ori
  * @version {@value MBIAMConstants#version}
  */
-class MBIAMAsyncTask_MetricCreate : AsyncTask<Void, Void, Void> {
+internal class MBIAMAsyncTask_MetricCreate : AsyncTask<Void, Void, Void> {
 
     /**
      * Context reference used to send data to Activity/Fragment

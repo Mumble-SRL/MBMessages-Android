@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
  * @author Enrico Ori
  * @version {@value MBIAMConstants#version}
  */
-class MBIAMAsyncTask_getMessages : AsyncTask<Void, Void, Void> {
+internal class MBIAMAsyncTask_getMessages : AsyncTask<Void, Void, Void> {
 
     /**
      * Context reference used to send data to Activity/Fragment
