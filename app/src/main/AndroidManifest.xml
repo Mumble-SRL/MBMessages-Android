@@ -1,4 +1,3 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mb_messages">
+<manifest package="mumble.mburger.mbmessages">
 
 </manifest>
