@@ -10,6 +10,7 @@ import mumble.mburger.mbmessages.iam.MBIAMData.CTA
 import mumble.mburger.mbmessages.iam.MBIAMData.Campaign
 import mumble.mburger.mbmessages.iam.MBIAMData.CampaignIAM
 import mumble.mburger.mbmessages.iam.MBIAMData.CampaignPush
+import mumble.mburger.mbmessages.triggers.*
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBApiManagerUtils
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 import org.json.JSONArray
@@ -19,7 +20,6 @@ import java.io.*
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
-import java.util.*
 
 class MBMessagesParser {
 
@@ -50,7 +50,7 @@ class MBMessagesParser {
             var starts_at: Long = -1
             var ends_at: Long = -1
             var automation: Int = -1
-            var triggers: String? = null
+            var triggers: MBCampaignTriggers? = null
             var created_at: Long = -1
             var updated_at: Long = -1
             var content: Any? = null
@@ -93,7 +93,8 @@ class MBMessagesParser {
                 }
 
                 if (MBCommonMethods.isJSONOk(jsonObject, "triggers")) {
-                    triggers = jsonObject.getString("triggers")
+                    val jTriggers = jsonObject.getJSONObject("triggers")
+                    triggers = parseTriggers(jTriggers)
                 }
 
                 if (MBCommonMethods.isJSONOk(jsonObject, "created_at")) {
@@ -279,6 +280,115 @@ class MBMessagesParser {
             }
 
             return CampaignPush(id, title, body, date, sent, topics, total, created_at, updated_at)
+        }
+
+        fun parseTriggers(jsonObject: JSONObject): MBCampaignTriggers {
+            var triggers = ArrayList<MBTrigger>()
+
+            val sTriggerMethod = jsonObject.getString("method")
+            var method = when (sTriggerMethod) {
+                "any" -> TriggerMethod.ANY
+                else -> TriggerMethod.ALL
+            }
+
+            val jTriggers = jsonObject.getJSONArray("triggers")
+            for (i in 0 until jTriggers.length()) {
+                val jTr = jTriggers.getJSONObject(i)
+                val type = jTr.getString("type")
+                var trigger: MBTrigger = when (type) {
+                    MBTriggersConstants.location -> {
+
+                        var after = -1
+                        var radius = -1
+                        var address: String? = null
+                        var latitude = (-1).toDouble()
+                        var longitude = (-1).toDouble()
+
+                        if (MBCommonMethods.isJSONOk(jTr, "after")) {
+                            after = jTr.getInt("after")
+                        }
+
+                        if (MBCommonMethods.isJSONOk(jTr, "radius")) {
+                            radius = jTr.getInt("radius")
+                        }
+
+                        if (MBCommonMethods.isJSONOk(jTr, "address")) {
+                            address = jTr.getString("address")
+                        }
+
+                        if (MBCommonMethods.isJSONOk(jTr, "latitude")) {
+                            latitude = jTr.getDouble("latitude")
+                        }
+
+                        if (MBCommonMethods.isJSONOk(jTr, "longitude")) {
+                            longitude = jTr.getDouble("longitude")
+                        }
+
+                        MBTriggerLocation(after = after, radius = radius, address = address,
+                                latitude = latitude, longitude = longitude)
+                    }
+
+                    MBTriggersConstants.app_opening -> {
+                        MBTriggerAppOpening(times = jTr.getInt("times"))
+                    }
+
+                    MBTriggersConstants.view -> {
+                        MBTriggerView(times = jTr.getInt("times"), view_name = jTr.getString("view_name"),
+                                seconds_on_view = jTr.getInt("seconds_on_view"))
+                    }
+
+                    MBTriggersConstants.inactive_user -> {
+                        MBTriggerInactiveUser(days = jTr.getInt("days"))
+                    }
+
+                    MBTriggersConstants.event -> {
+                        var times = -1
+                        var event_name: String? = null
+                        var metadata: MBEventMetadata? = null
+
+                        if (MBCommonMethods.isJSONOk(jTr, "times")) {
+                            times = jTr.getInt("times")
+                        }
+
+                        if (MBCommonMethods.isJSONOk(jTr, "event_name")) {
+                            event_name = jTr.getString("event_name")
+                        }
+
+                        if (MBCommonMethods.isJSONOk(jTr, "metadata")) {
+                            val jMtD = jTr.getJSONObject("metadata")
+                            val keys = jMtD.keys()
+
+                            while (keys.hasNext()) {
+                                val key: String = keys.next()
+                                try {
+                                    val value: String = jMtD.getString(key)
+                                    metadata = MBEventMetadata(key, value)
+                                } catch (e: JSONException) {
+                                }
+                            }
+                        }
+
+                        MBTriggerEvent(times = times, event_name = event_name, metadata = metadata)
+                    }
+
+                    MBTriggersConstants.tag_change -> {
+                        val operator = when (jTr.getString("operator")) {
+                            "=" -> TagChangeOperator.EQUALS
+                            else -> TagChangeOperator.NOT_EQUAL
+                        }
+
+                        MBTriggerTagChange(tag = jTr.getString("tag"), value = jTr.getString("value"), operator = operator)
+                    }
+
+                    else -> {
+                        MBTrigger("null")
+                    }
+                }
+
+                triggers.add(trigger)
+            }
+
+            return MBCampaignTriggers(method, triggers)
         }
 
         fun downloadImage(context: Context, id: String, url: String) {
