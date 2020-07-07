@@ -124,6 +124,6 @@ public class MBPushAsyncTask_RegisterTopics extends AsyncTask<Void, Void, Void> 
         map = MBAPIManager4.Companion.callApi(weakContext.get(),
                 MBPushAPIConstants.API_REGISTER_TOPICS, values, MBApiManagerConfig.Companion.getMODE_POST(),
                 false, false, MBPushAPIConstants.endpoint_push, MBPushAPIConstants.SERVER_HOSTNAME_PUSH,
-                true, valuesHeaders);
+                true, valuesHeaders, null);
     }
 }

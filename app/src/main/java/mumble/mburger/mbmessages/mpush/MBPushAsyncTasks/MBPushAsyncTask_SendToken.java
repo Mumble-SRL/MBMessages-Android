@@ -120,6 +120,6 @@ public class MBPushAsyncTask_SendToken extends AsyncTask<Void, Void, Void> {
         values.put("platform", "and");
         map = MBAPIManager4.Companion.callApi(weakContext.get(),
                 MBPushAPIConstants.API_TOKENS_PUSH, values, MBApiManagerConfig.Companion.getMODE_POST(), false,
-                false, MBPushAPIConstants.endpoint_push, MBPushAPIConstants.SERVER_HOSTNAME_PUSH, true, valuesHeaders);
+                false, MBPushAPIConstants.endpoint_push, MBPushAPIConstants.SERVER_HOSTNAME_PUSH, true, valuesHeaders, null);
     }
 }
