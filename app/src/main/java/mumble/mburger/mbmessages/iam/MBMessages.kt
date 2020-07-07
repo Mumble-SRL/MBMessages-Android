@@ -2,7 +2,7 @@ package mumble.mburger.mbmessages.iam
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
-import mumble.mburger.mbmessages.iam.MBIAMAsyncTasks.MBIAMAsyncTask_getCampaign
+import mumble.mburger.mbmessages.iam.MBIAMAsyncTasks.MBIAMAsyncTask_getMessages
 import mumble.mburger.mbmessages.iam.MBIAMData.Campaign
 import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBIAMCampaignListener
 import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBMessagesPluginInitialized
@@ -22,7 +22,7 @@ class MBMessages : MBIAMCampaignListener, MBPlugin() {
 
     override fun init(context: Context) {
         super.init(context)
-        MBIAMAsyncTask_getCampaign(context, this).execute()
+        MBIAMAsyncTask_getMessages(context, this).execute()
     }
 
     override fun doStart(activity: FragmentActivity) {

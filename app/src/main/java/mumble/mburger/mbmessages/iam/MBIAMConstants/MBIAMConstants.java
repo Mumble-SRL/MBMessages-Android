@@ -16,7 +16,7 @@ public class MBIAMConstants {
     public static final String IAM_STYLE_BANNER_CENTER = "center";
     public static final String IAM_STYLE_FULL_SCREEN_IMAGE = "fullscreen_image";
 
-    public static final String CAMPAIGN_MESSAGE = "message";
+    public static final String CAMPAIGN_MESSAGE = "inapp";
     public static final String CAMPAIGN_PUSH = "push";
 
     public static final String ACTION_LINK = "link";

@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
  * @author Enrico Ori
  * @version {@value MBIAMConstants#version}
  */
-class MBIAMAsyncTask_getCampaign : AsyncTask<Void, Void, Void> {
+class MBIAMAsyncTask_getMessages : AsyncTask<Void, Void, Void> {
 
     /**
      * Context reference used to send data to Activity/Fragment
@@ -98,6 +98,7 @@ class MBIAMAsyncTask_getCampaign : AsyncTask<Void, Void, Void> {
 
     fun putValuesAndCall() {
         val values = ContentValues()
+        values.put("device_id", MBCommonMethods.getDeviceId(weakContext.get()!!))
         map = MBAPIManager4.callApi(weakContext.get()!!, MBIAMAPIConstants.API_GET_MESSAGES, values,
                 MBApiManagerConfig.MODE_GET, true, false)
     }
