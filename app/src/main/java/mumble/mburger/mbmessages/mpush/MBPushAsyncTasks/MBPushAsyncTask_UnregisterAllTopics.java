@@ -111,6 +111,6 @@ public class MBPushAsyncTask_UnregisterAllTopics extends AsyncTask<Void, Void, V
         values.put("device_id", device_id);
         map = MBAPIManager4.Companion.callApi(weakContext.get(),
                 MBPushAPIConstants.API_UNREGISTER_ALL_TOPICS, values, MBApiManagerConfig.Companion.getMODE_POST(), false,
-                false, MBPushAPIConstants.endpoint_push, MBPushAPIConstants.SERVER_HOSTNAME_PUSH, true, valuesHeaders);
+                false, MBPushAPIConstants.endpoint_push, MBPushAPIConstants.SERVER_HOSTNAME_PUSH, true, valuesHeaders, null);
     }
 }
