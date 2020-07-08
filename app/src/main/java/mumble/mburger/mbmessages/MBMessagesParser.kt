@@ -1,4 +1,4 @@
-package mumble.mburger.mbmessages.iam
+package mumble.mburger.mbmessages
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import mumble.mburger.mbmessages.iam.MBIAMConstants.MBIAMConstants
+import mumble.mburger.mbmessages.iam.MBIAMDBHelper
 import mumble.mburger.mbmessages.iam.MBIAMData.CTA
 import mumble.mburger.mbmessages.iam.MBIAMData.Campaign
 import mumble.mburger.mbmessages.iam.MBIAMData.CampaignIAM
@@ -114,6 +115,9 @@ class MBMessagesParser {
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
+
+            val helper = MBIAMDBHelper(context)
+            helper.addACampaign(id, jsonObject)
 
             return Campaign(id, title, description, type, send_after_days, repeat, starts_at, ends_at, automation, triggers,
                     created_at, updated_at, content)

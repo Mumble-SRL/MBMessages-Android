@@ -7,7 +7,7 @@ import android.os.AsyncTask
 import mumble.mburger.mbmessages.iam.MBIAMConstants.MBIAMAPIConstants
 import mumble.mburger.mbmessages.iam.MBIAMData.Campaign
 import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBIAMCampaignListener
-import mumble.mburger.mbmessages.iam.MBMessagesParser
+import mumble.mburger.mbmessages.MBMessagesParser
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBAMActivityUtils
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBAPIManager4
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBApiManagerConfig
