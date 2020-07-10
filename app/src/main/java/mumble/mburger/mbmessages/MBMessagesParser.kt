@@ -8,9 +8,9 @@ import android.os.Build
 import mumble.mburger.mbmessages.iam.MBIAMConstants.MBIAMConstants
 import mumble.mburger.mbmessages.iam.MBIAMDBHelper
 import mumble.mburger.mbmessages.iam.MBIAMData.CTA
-import mumble.mburger.mbmessages.iam.MBIAMData.Campaign
-import mumble.mburger.mbmessages.iam.MBIAMData.CampaignIAM
-import mumble.mburger.mbmessages.iam.MBIAMData.CampaignPush
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessageIAM
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessagePush
 import mumble.mburger.mbmessages.triggers.*
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBApiManagerUtils
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
@@ -26,12 +26,12 @@ class MBMessagesParser {
 
     companion object {
 
-        fun parseCampaigns(context: Context, jCampaigns: JSONArray): ArrayList<Campaign> {
-            val campaigns = ArrayList<Campaign>()
+        fun parseMessages(context: Context, jCampaigns: JSONArray): ArrayList<MBMessage> {
+            val campaigns = ArrayList<MBMessage>()
             try {
                 for (i in 0 until jCampaigns.length()) {
                     val jCampaign = jCampaigns.getJSONObject(i)
-                    val campaign = parseCampaign(context, jCampaign)
+                    val campaign = parseMessage(context, jCampaign)
                     campaigns.add(campaign)
                 }
             } catch (e: JSONException) {
@@ -41,7 +41,7 @@ class MBMessagesParser {
             return campaigns
         }
 
-        fun parseCampaign(context: Context, jsonObject: JSONObject): Campaign {
+        fun parseMessage(context: Context, jsonObject: JSONObject): MBMessage {
             var id: Long = -1
             var title: String? = null
             var description: String? = null
@@ -119,11 +119,11 @@ class MBMessagesParser {
             val helper = MBIAMDBHelper(context)
             helper.addACampaign(id, jsonObject)
 
-            return Campaign(id, title, description, type, send_after_days, repeat, starts_at, ends_at, automation, triggers,
+            return MBMessage(id, title, description, type, send_after_days, repeat, starts_at, ends_at, automation, triggers,
                     created_at, updated_at, content)
         }
 
-        fun parseIAM(context: Context, jsonObject: JSONObject): CampaignIAM {
+        fun parseIAM(context: Context, jsonObject: JSONObject): MBMessageIAM {
             var id: Long = -1
             var type: String = MBIAMConstants.IAM_STYLE_BANNER_TOP
             var title: String? = null
@@ -223,11 +223,11 @@ class MBMessagesParser {
                 e.printStackTrace()
             }
 
-            return CampaignIAM(id, type, title, content, title_color, content_color, backgroundColor, null,
+            return MBMessageIAM(id, type, title, content, title_color, content_color, backgroundColor, null,
                     null, cta1, cta2, durationInSeconds, expiresAt, image)
         }
 
-        fun parsePush(jsonObject: JSONObject): CampaignPush {
+        fun parsePush(jsonObject: JSONObject): MBMessagePush {
             var id: String? = null
             var title: String? = null
             var body: String? = null
@@ -283,7 +283,7 @@ class MBMessagesParser {
                 e.printStackTrace()
             }
 
-            return CampaignPush(id, title, body, date, sent, topics, total, created_at, updated_at)
+            return MBMessagePush(id, title, body, date, sent, topics, total, created_at, updated_at)
         }
 
         fun parseTriggers(jsonObject: JSONObject): MBCampaignTriggers {

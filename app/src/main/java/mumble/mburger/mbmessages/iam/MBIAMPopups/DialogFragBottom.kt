@@ -13,7 +13,8 @@ import android.view.animation.DecelerateInterpolator
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.dialog_frag_bottom.*
 import mumble.mburger.mbmessages.R
-import mumble.mburger.mbmessages.iam.MBIAMData.CampaignIAM
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessageIAM
 import mumble.mburger.mbmessages.iam.MBMessagesManager
 import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
@@ -21,7 +22,8 @@ import mumble.mburger.sdk.kt.Common.MBCommonMethods
 class DialogFragBottom : DialogFragment() {
 
     lateinit var father: MBMessagesManager
-    lateinit var content: CampaignIAM
+    lateinit var content: MBMessageIAM
+    lateinit var mbMessage: MBMessage
 
     var i = 0
     var x = -1f
@@ -30,9 +32,10 @@ class DialogFragBottom : DialogFragment() {
     var highestPoint = -1f
     var threshold = -1f
 
-    fun initialize(father: MBMessagesManager, content: CampaignIAM) {
+    fun initialize(father: MBMessagesManager, mbMessage: MBMessage, content: MBMessageIAM) {
         this.father = father
         this.content = content
+        this.mbMessage = mbMessage
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -54,11 +57,11 @@ class DialogFragBottom : DialogFragment() {
         dfrag_bottom_drag_layout.layoutParams.height = dragDimen
 
         dfrag_bottom_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1, content.id.toString())
+            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString())
         }
 
         dfrag_bottom_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2, content.id.toString())
+            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString())
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_bottom_layout, dfrag_bottom_txt_title,
@@ -66,7 +69,7 @@ class DialogFragBottom : DialogFragment() {
 
         setLayout()
 
-        MBMessagesMetrics.trackShowMessage(requireContext(), content.id.toString())
+        MBMessagesMetrics.trackShowMessage(requireContext(), mbMessage.id.toString())
     }
 
     override fun onStart() {

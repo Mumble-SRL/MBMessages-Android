@@ -3,13 +3,13 @@ package mumble.mburger.mbmessages
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import mumble.mburger.mbmessages.iam.MBIAMAsyncTasks.MBIAMAsyncTask_getMessages
-import mumble.mburger.mbmessages.iam.MBIAMData.Campaign
-import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBIAMCampaignListener
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
+import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBIAMMBMessageListener
 import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBMessagesPluginInitialized
 import mumble.mburger.mbmessages.iam.MBMessagesManager
 import mumble.mburger.sdk.kt.MBPlugins.MBPlugin
 
-class MBMessages : MBIAMCampaignListener, MBPlugin() {
+class MBMessages : MBIAMMBMessageListener, MBPlugin() {
 
     companion object {
         var isAutomationConnected = false
@@ -38,9 +38,9 @@ class MBMessages : MBIAMCampaignListener, MBPlugin() {
         }
     }
 
-    override fun onCampaignObtained(campaigns: ArrayList<Campaign>?) {
+    override fun onCampaignObtained(MBMessages: ArrayList<MBMessage>?) {
         initialized = true
-        manager.campaigns = campaigns!!
+        manager.MBMessages = MBMessages!!
         initListener?.onInitialized()
     }
 

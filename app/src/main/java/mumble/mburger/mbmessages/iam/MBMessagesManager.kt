@@ -23,8 +23,8 @@ import androidx.lifecycle.Lifecycle
 import mumble.mburger.mbmessages.R
 import mumble.mburger.mbmessages.iam.MBIAMConstants.MBIAMConstants
 import mumble.mburger.mbmessages.iam.MBIAMData.CTA
-import mumble.mburger.mbmessages.iam.MBIAMData.Campaign
-import mumble.mburger.mbmessages.iam.MBIAMData.CampaignIAM
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessageIAM
 import mumble.mburger.mbmessages.iam.MBIAMPopups.DialogFragBottom
 import mumble.mburger.mbmessages.iam.MBIAMPopups.DialogFragCenter
 import mumble.mburger.mbmessages.iam.MBIAMPopups.DialogFragFullImage
@@ -37,7 +37,7 @@ import java.io.File
 
 class MBMessagesManager {
 
-    lateinit var campaigns: ArrayList<Campaign>
+    lateinit var MBMessages: ArrayList<MBMessage>
 
     var debugMode = false
 
@@ -114,18 +114,18 @@ class MBMessagesManager {
         if (!activity.isFinishing && isActivityInForeground) {
             currentPosition = 0
             val ids = getSeenIds(activity)
-            for (i in 0 until campaigns.size) {
-                val campaign = campaigns[i]
-                if ((campaign.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (campaign.content is CampaignIAM)) {
-                    val content = campaign.content as CampaignIAM
+            for (i in 0 until MBMessages.size) {
+                val mbMessage = MBMessages[i]
+                if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM)) {
+                    val content = mbMessage.content as MBMessageIAM
                     if (debugMode) {
                         currentPosition = i
-                        show(activity, content)
+                        show(activity, mbMessage, content)
                         break
                     } else {
                         if (!ids.contains(content.id)) {
                             currentPosition = i
-                            show(activity, content)
+                            show(activity, mbMessage, content)
                             break
                         }
                     }
@@ -138,18 +138,18 @@ class MBMessagesManager {
         val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
         if (!activity.isFinishing && isActivityInForeground) {
             val ids = getSeenIds(activity)
-            for (i in (currentPosition + 1) until campaigns.size) {
-                val campaign = campaigns[i]
-                if ((campaign.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (campaign.content is CampaignIAM)) {
-                    val content = campaign.content as CampaignIAM
+            for (i in (currentPosition + 1) until MBMessages.size) {
+                val mbMessage = MBMessages[i]
+                if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM)) {
+                    val content = mbMessage.content as MBMessageIAM
                     if (debugMode) {
                         currentPosition = i
-                        show(activity, content)
+                        show(activity, mbMessage, content)
                         break
                     } else {
                         if (!ids.contains(content.id)) {
                             currentPosition = i
-                            show(activity, content)
+                            show(activity, mbMessage, content)
                             break
                         }
                     }
@@ -158,39 +158,39 @@ class MBMessagesManager {
         }
     }
 
-    private fun show(activity: FragmentActivity, content: CampaignIAM) {
+    private fun show(activity: FragmentActivity, mbMessage: MBMessage, content: MBMessageIAM) {
         val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
         if (!activity.isFinishing && isActivityInForeground) {
             overrideColorsAndStyle(content)
             when (content.type) {
                 MBIAMConstants.IAM_STYLE_BANNER_TOP -> {
                     val dialog = DialogFragTop()
-                    dialog.initialize(this, content)
+                    dialog.initialize(this, mbMessage, content)
                     dialog.show(activity.supportFragmentManager, null)
                 }
 
                 MBIAMConstants.IAM_STYLE_FULL_SCREEN_IMAGE -> {
                     val dialog = DialogFragFullImage()
-                    dialog.initialize(this, content)
+                    dialog.initialize(this, mbMessage, content)
                     dialog.show(activity.supportFragmentManager, null)
                 }
 
                 MBIAMConstants.IAM_STYLE_BANNER_BOTTOM -> {
                     val dialog = DialogFragBottom()
-                    dialog.initialize(this, content)
+                    dialog.initialize(this, mbMessage, content)
                     dialog.show(activity.supportFragmentManager, null)
                 }
 
                 else -> {
                     val dialog = DialogFragCenter()
-                    dialog.initialize(this, content)
+                    dialog.initialize(this, mbMessage, content)
                     dialog.show(activity.supportFragmentManager, null)
                 }
             }
         }
     }
 
-    fun overrideColorsAndStyle(content: CampaignIAM) {
+    fun overrideColorsAndStyle(content: MBMessageIAM) {
         if (forceMessageStyle != null) {
             content.type = forceMessageStyle!!
         }
@@ -252,7 +252,7 @@ class MBMessagesManager {
         return ids
     }
 
-    fun putDataInIAM(context: Context, content: CampaignIAM, layout: ViewGroup, txt_title: AppCompatTextView?, txt_message: AppCompatTextView?,
+    fun putDataInIAM(context: Context, content: MBMessageIAM, layout: ViewGroup, txt_title: AppCompatTextView?, txt_message: AppCompatTextView?,
                      image: AppCompatImageView, ctaBtn1: AppCompatButton, ctaBtn2: AppCompatButton, btnSpace: Space?, closeBtn: AppCompatImageView?) {
 
         if ((titleFontRes != null) && (txt_title != null)) {
