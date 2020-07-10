@@ -13,14 +13,14 @@ abstract class MBurgerFBMessagingService : FirebaseMessagingService() {
         val intent = Intent()
 
         val map = remoteMessage.data
-        var push_id: String? = null
+        var message_id: String? = null
         if (map.containsKey("custom")) {
             val custom: String = map["custom"]!!
             if (custom.startsWith("{")) {
                 try {
                     val jObj = JSONObject(custom)
-                    if (MBCommonMethods.isJSONOk(jObj, "push_id")) {
-                        push_id = jObj.getString("push_id")
+                    if (MBCommonMethods.isJSONOk(jObj, "message_id")) {
+                        message_id = jObj.getString("message_id")
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
@@ -30,7 +30,7 @@ abstract class MBurgerFBMessagingService : FirebaseMessagingService() {
 
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         intent.putExtra("onMBNotificationStart", true)
-        intent.putExtra("MBPushId", push_id)
+        intent.putExtra("MBMessageId", message_id)
         onMBMessageReceived(remoteMessage, intent)
     }
 

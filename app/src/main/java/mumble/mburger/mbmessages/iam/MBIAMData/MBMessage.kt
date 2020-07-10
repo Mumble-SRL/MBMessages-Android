@@ -4,7 +4,7 @@ import mumble.mburger.mbmessages.triggers.MBCampaignTriggers
 import mumble.mburger.mbmessages.triggers.MBTrigger
 import java.io.Serializable
 
-class Campaign (
+class MBMessage (
 
         /**
          * Unique id of the campaign

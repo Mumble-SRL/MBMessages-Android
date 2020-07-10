@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import mumble.mburger.mbmessages.iam.MBIAMConstants.MBIAMAPIConstants
-import mumble.mburger.mbmessages.iam.MBIAMData.Campaign
-import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBIAMCampaignListener
-import mumble.mburger.mbmessages.iam.MBMessagesParser
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
+import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBIAMMBMessageListener
+import mumble.mburger.mbmessages.MBMessagesParser
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBAMActivityUtils
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBAPIManager4
 import mumble.mburger.sdk.kt.Common.MBApiManager.MBApiManagerConfig
@@ -38,9 +38,9 @@ internal class MBIAMAsyncTask_getMessages : AsyncTask<Void, Void, Void> {
     /**
      * If you wish to use a listener to retrieve the data
      */
-    private var listener: MBIAMCampaignListener? = null
+    private var listener: MBIAMMBMessageListener? = null
 
-    lateinit var campaigns: ArrayList<Campaign>
+    lateinit var MBMessages: ArrayList<MBMessage>
 
     private var result = MBApiManagerConfig.COMMON_INTERNAL_ERROR
     private var error: String? = null
@@ -55,7 +55,7 @@ internal class MBIAMAsyncTask_getMessages : AsyncTask<Void, Void, Void> {
         this.action = custom_action
     }
 
-    constructor(context: Context, listener: MBIAMCampaignListener?) {
+    constructor(context: Context, listener: MBIAMMBMessageListener?) {
         this.weakContext = WeakReference(context)
         this.listener = listener
     }
@@ -91,7 +91,7 @@ internal class MBIAMAsyncTask_getMessages : AsyncTask<Void, Void, Void> {
             if (error != null) {
                 listener!!.onCampaignError(error!!)
             } else {
-                listener!!.onCampaignObtained(campaigns)
+                listener!!.onCampaignObtained(MBMessages)
             }
         }
     }
@@ -107,7 +107,7 @@ internal class MBIAMAsyncTask_getMessages : AsyncTask<Void, Void, Void> {
         try {
             val jPayload = JSONObject(sPayload)
             val jBody = jPayload.getJSONArray("body")
-            campaigns = MBMessagesParser.parseCampaigns(weakContext.get()!!, jBody)
+            MBMessages = MBMessagesParser.parseMessages(weakContext.get()!!, jBody)
         } catch (e: JSONException) {
             e.printStackTrace()
         }

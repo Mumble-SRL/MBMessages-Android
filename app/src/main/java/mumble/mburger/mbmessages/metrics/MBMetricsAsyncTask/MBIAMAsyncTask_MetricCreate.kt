@@ -25,18 +25,16 @@ internal class MBIAMAsyncTask_MetricCreate : AsyncTask<Void, Void, Void> {
 
     var type: String
     var metric: String
-    var push_id: String? = null
-    var message_id: String? = null
+    var message_id: String
 
     private var result = MBApiManagerConfig.COMMON_INTERNAL_ERROR
     private var error: String? = null
     private var map: MutableMap<String, Any?>? = null
 
-    constructor(context: Context, type: String, metric: String, push_id: String?, message_id: String?) {
+    constructor(context: Context, type: String, metric: String, message_id: String) {
         this.weakContext = WeakReference(context)
         this.type = type
         this.metric = metric
-        this.push_id = push_id
         this.message_id = message_id
     }
 
@@ -68,15 +66,7 @@ internal class MBIAMAsyncTask_MetricCreate : AsyncTask<Void, Void, Void> {
         values.put("device_id", MBCommonMethods.getDeviceId(weakContext.get()!!))
         values.put("type", type)
         values.put("metric", metric)
-
-        if (push_id != null) {
-            values.put("push_id", push_id)
-        }
-
-        if (message_id != null) {
-            values.put("inapp_id", message_id)
-        }
-
+        values.put("message_id", message_id)
         map = MBAPIManager4.callApi(weakContext.get()!!, MBIAMAPIConstants.API_CREATE_METRICS, values,
                 MBApiManagerConfig.MODE_POST, false, false)
     }

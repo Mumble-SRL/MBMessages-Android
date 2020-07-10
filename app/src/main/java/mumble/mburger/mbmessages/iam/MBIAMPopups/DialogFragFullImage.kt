@@ -10,18 +10,21 @@ import android.view.ViewGroup
 import android.view.Window
 import kotlinx.android.synthetic.main.dialog_frag_fullimage.*
 import mumble.mburger.mbmessages.R
-import mumble.mburger.mbmessages.iam.MBIAMData.CampaignIAM
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessageIAM
 import mumble.mburger.mbmessages.iam.MBMessagesManager
 import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 
 class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
 
     lateinit var father: MBMessagesManager
-    lateinit var content: CampaignIAM
+    lateinit var content: MBMessageIAM
+    lateinit var mbMessage: MBMessage
 
-    fun initialize(father: MBMessagesManager, content: CampaignIAM) {
+    fun initialize(father: MBMessagesManager, mbMessage: MBMessage, content: MBMessageIAM) {
         this.father = father
         this.content = content
+        this.mbMessage = mbMessage
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -43,18 +46,18 @@ class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
         }
 
         dfrag_fullimage_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1, content.id.toString())
+            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString())
         }
 
         dfrag_fullimage_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2, content.id.toString())
+            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString())
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_fullimage_layout, null, null,
                 dfrag_fullimage_img, dfrag_fullimage_btn_1, dfrag_fullimage_btn_2, null,
                 dfrag_fullimage_close)
 
-        MBMessagesMetrics.trackShowMessage(requireContext(), content.id.toString())
+        MBMessagesMetrics.trackShowMessage(requireContext(), mbMessage.id.toString())
     }
 
     override fun onStart() {

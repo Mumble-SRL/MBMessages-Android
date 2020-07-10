@@ -2,7 +2,7 @@ package mumble.mburger.mbmessages.iam.MBIAMData
 
 import java.io.Serializable
 
-class CampaignIAM(
+class MBMessageIAM(
         var id: Long,
         var type: String,
         var title: String?,

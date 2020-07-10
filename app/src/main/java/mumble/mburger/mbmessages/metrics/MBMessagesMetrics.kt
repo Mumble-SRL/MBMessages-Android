@@ -14,22 +14,18 @@ class MBMessagesMetrics {
         private val metric_view = "view"
         private val metric_interaction = "interaction"
 
-        fun trackShowMessage(context: Context, message_id: String?) {
-            if (message_id != null) {
-                MBIAMAsyncTask_MetricCreate(context, type_message, metric_view, null, message_id).execute()
-            }
+        fun trackShowMessage(context: Context, message_id: String) {
+            MBIAMAsyncTask_MetricCreate(context, type_message, metric_view, message_id).execute()
         }
 
-        fun trackInteractionMessage(context: Context, message_id: String?) {
-            if (message_id != null) {
-                MBIAMAsyncTask_MetricCreate(context, type_message, metric_interaction, null, message_id).execute()
-            }
+        fun trackInteractionMessage(context: Context, message_id: String) {
+            MBIAMAsyncTask_MetricCreate(context, type_message, metric_interaction, message_id).execute()
         }
 
         fun trackShowPush(context: Context, intent: Intent) {
             if (intent.extras != null) {
                 if (intent.getBooleanExtra("onMBNotificationStart", false)) {
-                    val pushId = intent.getStringExtra("MBPushId")
+                    val pushId = intent.getStringExtra("MBMessageId")
                     trackShowPush(context, pushId)
                 }
             }
@@ -37,14 +33,14 @@ class MBMessagesMetrics {
 
         fun trackShowPush(context: Context, pushID: String?) {
             if (pushID != null) {
-                MBIAMAsyncTask_MetricCreate(context, type_push, metric_view, pushID, null).execute()
+                MBIAMAsyncTask_MetricCreate(context, type_push, metric_view, pushID).execute()
             }
         }
 
         fun checkOpenedFromPush(context: Context, intent: Intent) {
             if (intent.extras != null) {
                 if (intent.getBooleanExtra("onMBNotificationStart", false)) {
-                    val pushId = intent.getStringExtra("MBPushId")
+                    val pushId = intent.getStringExtra("MBMessageId")
                     checkOpenedFromPush(context, pushId)
                 }
             }
@@ -52,7 +48,7 @@ class MBMessagesMetrics {
 
         fun checkOpenedFromPush(context: Context, pushID: String?) {
             if (pushID != null) {
-                MBIAMAsyncTask_MetricCreate(context, type_message, metric_interaction, pushID, null).execute()
+                MBIAMAsyncTask_MetricCreate(context, type_message, metric_interaction, pushID).execute()
             }
         }
     }

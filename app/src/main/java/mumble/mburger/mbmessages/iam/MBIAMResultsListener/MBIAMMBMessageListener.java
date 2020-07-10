@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import mumble.mburger.mbmessages.iam.MBIAMAsyncTasks.MBIAMAsyncTask_getMessages;
 import mumble.mburger.mbmessages.iam.MBIAMConstants.MBIAMConstants;
-import mumble.mburger.mbmessages.iam.MBIAMData.Campaign;
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage;
 
 /**
  * Interface to use with {@link MBIAMAsyncTask_getMessages (Context)}, and similar, methods,
@@ -13,7 +13,7 @@ import mumble.mburger.mbmessages.iam.MBIAMData.Campaign;
  * @author Enrico Ori
  * @version {@value MBIAMConstants#version}
  */
-public interface MBIAMCampaignListener {
-    void onCampaignObtained(ArrayList<Campaign> campaigns);
+public interface MBIAMMBMessageListener {
+    void onCampaignObtained(ArrayList<MBMessage> MBMessages);
     void onCampaignError(String error);
 }
