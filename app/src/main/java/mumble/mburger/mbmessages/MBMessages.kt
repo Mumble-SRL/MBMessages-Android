@@ -7,6 +7,7 @@ import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
 import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBIAMMBMessageListener
 import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBMessagesPluginInitialized
 import mumble.mburger.mbmessages.iam.MBMessagesManager
+import mumble.mburger.sdk.kt.Common.MBPluginsManager
 import mumble.mburger.sdk.kt.MBPlugins.MBPlugin
 
 class MBMessages : MBIAMMBMessageListener, MBPlugin() {
@@ -21,30 +22,38 @@ class MBMessages : MBIAMMBMessageListener, MBPlugin() {
     override var error: String? = null
     override var initialized: Boolean = false
 
-    var manager: MBMessagesManager = MBMessagesManager()
-
     var initListener: MBMessagesPluginInitialized? = null
 
     override fun init(context: Context) {
         super.init(context)
         isAutomationConnected = false
+        MBMessagesManager.currentPosition = 0
         MBIAMAsyncTask_getMessages(context, this).execute()
     }
 
     override fun doStart(activity: FragmentActivity) {
         super.doStart(activity)
         if (initialized) {
-            manager.startFlow(activity)
+            MBMessagesManager.startFlow(activity)
         }
     }
 
-    override fun onCampaignObtained(MBMessages: ArrayList<MBMessage>?) {
+    override fun onMessagesObtained(messages: ArrayList<MBMessage>?) {
         initialized = true
-        manager.MBMessages = MBMessages!!
+        MBMessagesManager.MBMessages = messages!!
         initListener?.onInitialized()
+
+        val automationMessages = ArrayList<MBMessage>()
+        for (message in messages) {
+            if (message.automation == 1) {
+                automationMessages.add(message)
+            }
+        }
+
+        MBPluginsManager.messagesReceived(automationMessages, false)
     }
 
-    override fun onCampaignError(error: String?) {
+    override fun onMessagesError(error: String?) {
         initialized = true
         this.error = error
         initListener?.onInitializedError(error)

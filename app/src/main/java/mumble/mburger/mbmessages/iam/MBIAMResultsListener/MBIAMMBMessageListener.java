@@ -14,6 +14,6 @@ import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage;
  * @version {@value MBIAMConstants#version}
  */
 public interface MBIAMMBMessageListener {
-    void onCampaignObtained(ArrayList<MBMessage> MBMessages);
-    void onCampaignError(String error);
+    void onMessagesObtained(ArrayList<MBMessage> MBMessages);
+    void onMessagesError(String error);
 }

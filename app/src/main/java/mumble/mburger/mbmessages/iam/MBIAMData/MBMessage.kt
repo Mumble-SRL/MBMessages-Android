@@ -1,7 +1,5 @@
 package mumble.mburger.mbmessages.iam.MBIAMData
 
-import mumble.mburger.mbmessages.triggers.MBCampaignTriggers
-import mumble.mburger.mbmessages.triggers.MBTrigger
 import java.io.Serializable
 
 class MBMessage (
@@ -54,7 +52,7 @@ class MBMessage (
         /**
          * Triggers
          */
-        var triggers: MBCampaignTriggers?,
+        var sTriggers: String?,
 
         /**
          * Creation time in millis

@@ -37,413 +37,434 @@ import java.io.File
 
 class MBMessagesManager {
 
-    lateinit var MBMessages: ArrayList<MBMessage>
+    companion object {
 
-    var debugMode = false
+        lateinit var MBMessages: ArrayList<MBMessage>
 
-    private var currentPosition = 0
+        var currentPosition = 0
 
-    /**
-     * STYLING AND CUSTOMIZATION
-     **/
+        /**
+         * STYLING AND CUSTOMIZATION
+         **/
 
-    /**Force the message to be one of the following: MBIAMConstants#IAM_STYLE_BANNER_TOP,
-     * MBIAMConstants#IAM_STYLE_BANNER_BOTTOM, MBIAMConstants#IAM_STYLE_BANNER_CENTER, MBIAMConstants#IAM_STYLE_FULL_SCREEN_IMAGE
-     **/
-    var forceMessageStyle: String? = null
+        /**Force the message to be one of the following: MBIAMConstants#IAM_STYLE_BANNER_TOP,
+         * MBIAMConstants#IAM_STYLE_BANNER_BOTTOM, MBIAMConstants#IAM_STYLE_BANNER_CENTER, MBIAMConstants#IAM_STYLE_FULL_SCREEN_IMAGE
+         **/
+        var forceMessageStyle: String? = null
 
-    /**Int Color reference for the background of the card**/
-    var backgroundColor: Int? = null
+        /**Int Color reference for the background of the card**/
+        var backgroundColor: Int? = null
 
-    /**Int Color reference for the title**/
-    var titleColor: Int? = null
+        /**Int Color reference for the title**/
+        var titleColor: Int? = null
 
-    /**Int Color reference for the body**/
-    var bodyColor: Int? = null
+        /**Int Color reference for the body**/
+        var bodyColor: Int? = null
 
-    /**Int Color reference to tint the close button**/
-    var closeButtonColor: Int? = null
+        /**Int Color reference to tint the close button**/
+        var closeButtonColor: Int? = null
 
-    /**Int Color reference to tint the close button**/
-    var closeButtonBackgroundColor: Int? = null
+        /**Int Color reference to tint the close button**/
+        var closeButtonBackgroundColor: Int? = null
 
-    /**Int Color reference for the first button background**/
-    var button1BackgroundColor: Int? = null
+        /**Int Color reference for the first button background**/
+        var button1BackgroundColor: Int? = null
 
-    /**Int Color reference for the first button text**/
-    var button1TitleColor: Int? = null
+        /**Int Color reference for the first button text**/
+        var button1TitleColor: Int? = null
 
-    /**Int Color reference for the second button background**/
-    var button2BackgroundColor: Int? = null
+        /**Int Color reference for the second button background**/
+        var button2BackgroundColor: Int? = null
 
-    /**Int Color reference for the second button text**/
-    var button2TitleColor: Int? = null
+        /**Int Color reference for the second button text**/
+        var button2TitleColor: Int? = null
 
-    /**Title font resource**/
-    var titleFontRes: Int? = null
+        /**Title font resource**/
+        var titleFontRes: Int? = null
 
-    /**Body font resource**/
-    var bodyFontRes: Int? = null
+        /**Body font resource**/
+        var bodyFontRes: Int? = null
 
-    /**Buttons font resource**/
-    var buttonsTextFontRes: Int? = null
+        /**Buttons font resource**/
+        var buttonsTextFontRes: Int? = null
 
-    /**Title text size resource**/
-    var titleSizeRes: Int? = null
+        /**Title text size resource**/
+        var titleSizeRes: Int? = null
 
-    /**Body text size resource**/
-    var bodySizeRes: Int? = null
+        /**Body text size resource**/
+        var bodySizeRes: Int? = null
 
-    /**Buttons text size resource**/
-    var buttonsSizeRes: Int? = null
+        /**Buttons text size resource**/
+        var buttonsSizeRes: Int? = null
 
-    var clickListener: MNBIAMClickListener? = null
+        var debugMode = false
 
-    fun addMessageSeen(id: Long, context: Context) {
-        val jMessagesSeen = JSONArray(MBCommonMethods.getSharedPreferences(context)!!
-                .getString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, "[]"))
+        var clickListener: MNBIAMClickListener? = null
 
-        jMessagesSeen.put(id)
 
-        MBCommonMethods.getSharedPreferencesEditor(context)!!
-                .putString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, jMessagesSeen.toString()).commit()
-    }
+        fun overrideColorsAndStyle(content: MBMessageIAM) {
+            if (forceMessageStyle != null) {
+                content.type = forceMessageStyle!!
+            }
 
-    fun startFlow(activity: FragmentActivity) {
-        val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-        if (!activity.isFinishing && isActivityInForeground) {
-            currentPosition = 0
-            val ids = getSeenIds(activity)
-            for (i in 0 until MBMessages.size) {
-                val mbMessage = MBMessages[i]
+            if (backgroundColor != null) {
+                content.backgroundColor = backgroundColor!!
+            }
+
+            if (titleColor != null) {
+                content.title_color = titleColor!!
+            }
+
+            if (bodyColor != null) {
+                content.content_color = bodyColor!!
+            }
+
+            if (closeButtonColor != null) {
+                content.closeButtonColor = closeButtonColor!!
+            }
+
+            if (closeButtonBackgroundColor != null) {
+                content.closeButtonBGColor = closeButtonBackgroundColor!!
+            }
+
+            if (button1BackgroundColor != null) {
+                if (content.cta1 != null) {
+                    content.cta1!!.background_color = button1BackgroundColor!!
+                }
+            }
+
+            if (button1TitleColor != null) {
+                if (content.cta1 != null) {
+                    content.cta1!!.text_color = button1TitleColor!!
+                }
+            }
+
+            if (button2BackgroundColor != null) {
+                if (content.cta2 != null) {
+                    content.cta2!!.background_color = button2BackgroundColor!!
+                }
+            }
+
+            if (button2TitleColor != null) {
+                if (content.cta2 != null) {
+                    content.cta2!!.text_color = button2TitleColor!!
+                }
+            }
+        }
+
+        fun startFlow(mbMessage: MBMessage, activity: FragmentActivity) {
+            val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!activity.isFinishing && isActivityInForeground) {
+                val ids = getSeenIds(activity)
                 if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM)) {
                     val content = mbMessage.content as MBMessageIAM
                     if (debugMode) {
-                        currentPosition = i
                         show(activity, mbMessage, content)
-                        break
                     } else {
                         if (!ids.contains(content.id)) {
-                            currentPosition = i
                             show(activity, mbMessage, content)
-                            break
                         }
                     }
                 }
             }
         }
-    }
 
-    fun continueFlow(activity: FragmentActivity) {
-        val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-        if (!activity.isFinishing && isActivityInForeground) {
-            val ids = getSeenIds(activity)
-            for (i in (currentPosition + 1) until MBMessages.size) {
-                val mbMessage = MBMessages[i]
-                if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM)) {
-                    val content = mbMessage.content as MBMessageIAM
-                    if (debugMode) {
-                        currentPosition = i
-                        show(activity, mbMessage, content)
-                        break
-                    } else {
-                        if (!ids.contains(content.id)) {
+        fun getSeenIds(context: Context): ArrayList<Long> {
+            val ids = ArrayList<Long>()
+            val jMessagesSeen = JSONArray(MBCommonMethods.getSharedPreferences(context)!!
+                    .getString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, "[]"))
+
+            for (i in 0 until jMessagesSeen.length()) {
+                ids.add(jMessagesSeen.getLong(i))
+            }
+
+            return ids
+        }
+
+        private fun show(activity: FragmentActivity, mbMessage: MBMessage, content: MBMessageIAM) {
+            val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!activity.isFinishing && isActivityInForeground) {
+                overrideColorsAndStyle(content)
+                when (content.type) {
+                    MBIAMConstants.IAM_STYLE_BANNER_TOP -> {
+                        val dialog = DialogFragTop()
+                        dialog.initialize(this, mbMessage, content)
+                        dialog.show(activity.supportFragmentManager, null)
+                    }
+
+                    MBIAMConstants.IAM_STYLE_FULL_SCREEN_IMAGE -> {
+                        val dialog = DialogFragFullImage()
+                        dialog.initialize(this, mbMessage, content)
+                        dialog.show(activity.supportFragmentManager, null)
+                    }
+
+                    MBIAMConstants.IAM_STYLE_BANNER_BOTTOM -> {
+                        val dialog = DialogFragBottom()
+                        dialog.initialize(this, mbMessage, content)
+                        dialog.show(activity.supportFragmentManager, null)
+                    }
+
+                    else -> {
+                        val dialog = DialogFragCenter()
+                        dialog.initialize(this, mbMessage, content)
+                        dialog.show(activity.supportFragmentManager, null)
+                    }
+                }
+            }
+        }
+
+        fun addMessageSeen(id: Long, context: Context) {
+            val jMessagesSeen = JSONArray(MBCommonMethods.getSharedPreferences(context)!!
+                    .getString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, "[]"))
+
+            jMessagesSeen.put(id)
+
+            MBCommonMethods.getSharedPreferencesEditor(context)!!
+                    .putString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, jMessagesSeen.toString()).commit()
+        }
+
+        fun startFlow(activity: FragmentActivity) {
+            val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!activity.isFinishing && isActivityInForeground) {
+                currentPosition = 0
+                val ids = getSeenIds(activity)
+                for (i in 0 until MBMessages.size) {
+                    val mbMessage = MBMessages[i]
+                    if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM)) {
+                        val content = mbMessage.content as MBMessageIAM
+                        if (debugMode) {
                             currentPosition = i
                             show(activity, mbMessage, content)
                             break
+                        } else {
+                            if (!ids.contains(content.id)) {
+                                currentPosition = i
+                                show(activity, mbMessage, content)
+                                break
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    private fun show(activity: FragmentActivity, mbMessage: MBMessage, content: MBMessageIAM) {
-        val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-        if (!activity.isFinishing && isActivityInForeground) {
-            overrideColorsAndStyle(content)
-            when (content.type) {
-                MBIAMConstants.IAM_STYLE_BANNER_TOP -> {
-                    val dialog = DialogFragTop()
-                    dialog.initialize(this, mbMessage, content)
-                    dialog.show(activity.supportFragmentManager, null)
-                }
-
-                MBIAMConstants.IAM_STYLE_FULL_SCREEN_IMAGE -> {
-                    val dialog = DialogFragFullImage()
-                    dialog.initialize(this, mbMessage, content)
-                    dialog.show(activity.supportFragmentManager, null)
-                }
-
-                MBIAMConstants.IAM_STYLE_BANNER_BOTTOM -> {
-                    val dialog = DialogFragBottom()
-                    dialog.initialize(this, mbMessage, content)
-                    dialog.show(activity.supportFragmentManager, null)
-                }
-
-                else -> {
-                    val dialog = DialogFragCenter()
-                    dialog.initialize(this, mbMessage, content)
-                    dialog.show(activity.supportFragmentManager, null)
+        fun continueFlow(activity: FragmentActivity) {
+            val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!activity.isFinishing && isActivityInForeground) {
+                val ids = getSeenIds(activity)
+                for (i in (currentPosition + 1) until MBMessages.size) {
+                    val mbMessage = MBMessages[i]
+                    if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM)) {
+                        val content = mbMessage.content as MBMessageIAM
+                        if (debugMode) {
+                            currentPosition = i
+                            show(activity, mbMessage, content)
+                            break
+                        } else {
+                            if (!ids.contains(content.id)) {
+                                currentPosition = i
+                                show(activity, mbMessage, content)
+                                break
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
 
-    fun overrideColorsAndStyle(content: MBMessageIAM) {
-        if (forceMessageStyle != null) {
-            content.type = forceMessageStyle!!
-        }
+        fun putDataInIAM(context: Context, content: MBMessageIAM, layout: ViewGroup, txt_title: AppCompatTextView?, txt_message: AppCompatTextView?,
+                         image: AppCompatImageView, ctaBtn1: AppCompatButton, ctaBtn2: AppCompatButton, btnSpace: Space?, closeBtn: AppCompatImageView?) {
 
-        if (backgroundColor != null) {
-            content.backgroundColor = backgroundColor!!
-        }
+            if ((titleFontRes != null) && (txt_title != null)) {
+                txt_title.typeface = ResourcesCompat.getFont(context, titleFontRes!!)
+            }
 
-        if (titleColor != null) {
-            content.title_color = titleColor!!
-        }
+            if ((bodyFontRes != null) && (txt_message != null)) {
+                txt_message.typeface = ResourcesCompat.getFont(context, bodyFontRes!!)
+            }
 
-        if (bodyColor != null) {
-            content.content_color = bodyColor!!
-        }
+            if (buttonsTextFontRes != null) {
+                ctaBtn1.typeface = ResourcesCompat.getFont(context, buttonsTextFontRes!!)
+                ctaBtn2.typeface = ResourcesCompat.getFont(context, buttonsTextFontRes!!)
+            }
 
-        if (closeButtonColor != null) {
-            content.closeButtonColor = closeButtonColor!!
-        }
+            if ((titleSizeRes != null) && (txt_title != null)) {
+                txt_title.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimensionPixelSize(titleSizeRes!!).toFloat())
+            }
 
-        if (closeButtonBackgroundColor != null) {
-            content.closeButtonBGColor = closeButtonBackgroundColor!!
-        }
+            if ((bodySizeRes != null) && (txt_message != null)) {
+                txt_message.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimensionPixelSize(bodySizeRes!!).toFloat())
+            }
 
-        if (button1BackgroundColor != null) {
+            if (buttonsSizeRes != null) {
+                ctaBtn1.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimensionPixelSize(buttonsSizeRes!!).toFloat())
+                ctaBtn2.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimensionPixelSize(buttonsSizeRes!!).toFloat())
+            }
+
+            if (content.title_color != null) {
+                txt_title?.setTextColor(content.title_color!!)
+            }
+
+            if (content.content_color != null) {
+                txt_message?.setTextColor(content.content_color!!)
+            }
+
+            if (content.title != null) {
+                txt_title?.text = content.title
+            } else {
+                txt_title?.visibility = View.GONE
+            }
+
+            if (content.content != null) {
+                txt_message?.text = content.content
+            } else {
+                txt_message?.visibility = View.GONE
+            }
+
+            if (content.image != null) {
+                setImageFromMemory(context, content.id.toString(), image)
+            } else {
+                image.visibility = View.GONE
+            }
+
+            if (content.backgroundColor != null) {
+                ViewCompat.setBackgroundTintList(layout, ColorStateList.valueOf(content.backgroundColor!!))
+            }
+
             if (content.cta1 != null) {
-                content.cta1!!.background_color = button1BackgroundColor!!
-            }
-        }
+                val cta1 = content.cta1!!
+                ctaBtn1.text = cta1.text
 
-        if (button1TitleColor != null) {
-            if (content.cta1 != null) {
-                content.cta1!!.text_color = button1TitleColor!!
-            }
-        }
+                if (cta1.background_color != null) {
+                    ViewCompat.setBackgroundTintList(ctaBtn1, ColorStateList.valueOf(cta1.background_color!!))
+                }
 
-        if (button2BackgroundColor != null) {
+                if (cta1.text_color != null) {
+                    ctaBtn1.setTextColor(cta1.text_color!!)
+                }
+            } else {
+                ctaBtn1.visibility = View.GONE
+                btnSpace?.visibility = View.GONE
+            }
+
             if (content.cta2 != null) {
-                content.cta2!!.background_color = button2BackgroundColor!!
+                val cta2 = content.cta2!!
+                ctaBtn2.text = cta2.text
+
+                if (cta2.background_color != null) {
+                    ViewCompat.setBackgroundTintList(ctaBtn2, ColorStateList.valueOf(cta2.background_color!!))
+                }
+
+                if (cta2.text_color != null) {
+                    ctaBtn2.setTextColor(cta2.text_color!!)
+                }
+            } else {
+                ctaBtn2.visibility = View.GONE
+                btnSpace?.visibility = View.GONE
+            }
+
+            if ((closeButtonColor != null) && (closeBtn != null)) {
+                ImageViewCompat.setImageTintList(closeBtn, ColorStateList.valueOf(closeButtonColor!!))
+            }
+
+            if ((closeButtonBackgroundColor != null) && (closeBtn != null)) {
+                ViewCompat.setBackgroundTintList(closeBtn, ColorStateList.valueOf(closeButtonBackgroundColor!!))
             }
         }
 
-        if (button2TitleColor != null) {
-            if (content.cta2 != null) {
-                content.cta2!!.text_color = button2TitleColor!!
-            }
-        }
-    }
-
-    fun getSeenIds(context: Context): ArrayList<Long> {
-        val ids = ArrayList<Long>()
-        val jMessagesSeen = JSONArray(MBCommonMethods.getSharedPreferences(context)!!
-                .getString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, "[]"))
-
-        for (i in 0 until jMessagesSeen.length()) {
-            ids.add(jMessagesSeen.getLong(i))
-        }
-
-        return ids
-    }
-
-    fun putDataInIAM(context: Context, content: MBMessageIAM, layout: ViewGroup, txt_title: AppCompatTextView?, txt_message: AppCompatTextView?,
-                     image: AppCompatImageView, ctaBtn1: AppCompatButton, ctaBtn2: AppCompatButton, btnSpace: Space?, closeBtn: AppCompatImageView?) {
-
-        if ((titleFontRes != null) && (txt_title != null)) {
-            txt_title.typeface = ResourcesCompat.getFont(context, titleFontRes!!)
-        }
-
-        if ((bodyFontRes != null) && (txt_message != null)) {
-            txt_message.typeface = ResourcesCompat.getFont(context, bodyFontRes!!)
-        }
-
-        if (buttonsTextFontRes != null) {
-            ctaBtn1.typeface = ResourcesCompat.getFont(context, buttonsTextFontRes!!)
-            ctaBtn2.typeface = ResourcesCompat.getFont(context, buttonsTextFontRes!!)
-        }
-
-        if ((titleSizeRes != null) && (txt_title != null)) {
-            txt_title.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimensionPixelSize(titleSizeRes!!).toFloat())
-        }
-
-        if ((bodySizeRes != null) && (txt_message != null)) {
-            txt_message.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimensionPixelSize(bodySizeRes!!).toFloat())
-        }
-
-        if (buttonsSizeRes != null) {
-            ctaBtn1.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimensionPixelSize(buttonsSizeRes!!).toFloat())
-            ctaBtn2.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimensionPixelSize(buttonsSizeRes!!).toFloat())
-        }
-
-        if (content.title_color != null) {
-            txt_title?.setTextColor(content.title_color!!)
-        }
-
-        if (content.content_color != null) {
-            txt_message?.setTextColor(content.content_color!!)
-        }
-
-        if (content.title != null) {
-            txt_title?.text = content.title
-        } else {
-            txt_title?.visibility = View.GONE
-        }
-
-        if (content.content != null) {
-            txt_message?.text = content.content
-        } else {
-            txt_message?.visibility = View.GONE
-        }
-
-        if (content.image != null) {
-            setImageFromMemory(context, content.id.toString(), image)
-        } else {
-            image.visibility = View.GONE
-        }
-
-        if (content.backgroundColor != null) {
-            ViewCompat.setBackgroundTintList(layout, ColorStateList.valueOf(content.backgroundColor!!))
-        }
-
-        if (content.cta1 != null) {
-            val cta1 = content.cta1!!
-            ctaBtn1.text = cta1.text
-
-            if (cta1.background_color != null) {
-                ViewCompat.setBackgroundTintList(ctaBtn1, ColorStateList.valueOf(cta1.background_color!!))
-            }
-
-            if (cta1.text_color != null) {
-                ctaBtn1.setTextColor(cta1.text_color!!)
-            }
-        } else {
-            ctaBtn1.visibility = View.GONE
-            btnSpace?.visibility = View.GONE
-        }
-
-        if (content.cta2 != null) {
-            val cta2 = content.cta2!!
-            ctaBtn2.text = cta2.text
-
-            if (cta2.background_color != null) {
-                ViewCompat.setBackgroundTintList(ctaBtn2, ColorStateList.valueOf(cta2.background_color!!))
-            }
-
-            if (cta2.text_color != null) {
-                ctaBtn2.setTextColor(cta2.text_color!!)
-            }
-        } else {
-            ctaBtn2.visibility = View.GONE
-            btnSpace?.visibility = View.GONE
-        }
-
-        if ((closeButtonColor != null) && (closeBtn != null)) {
-            ImageViewCompat.setImageTintList(closeBtn, ColorStateList.valueOf(closeButtonColor!!))
-        }
-
-        if ((closeButtonBackgroundColor != null) && (closeBtn != null)) {
-            ViewCompat.setBackgroundTintList(closeBtn, ColorStateList.valueOf(closeButtonBackgroundColor!!))
-        }
-    }
-
-    fun setImageFromMemory(context: Context, id: String, image: AppCompatImageView) {
-        val extStorage = context.getExternalFilesDir(null)
-        if (!extStorage!!.exists()) {
-            extStorage.mkdirs()
-        }
-
-        val imgFile = File(extStorage, "%s.jpg".format(id))
-        if (imgFile.exists()) {
-            image.setImageBitmap(BitmapFactory.decodeFile(imgFile.absolutePath))
-        }
-    }
-
-    fun getImageSizeFullScreen(act: FragmentActivity, id: String): Array<Int> {
-        val sArray = arrayOf(0, 0)
-        val isActivityInForeground = act.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-        if (!act.isFinishing && isActivityInForeground) {
-            val extStorage = act.getExternalFilesDir(null)
+        fun setImageFromMemory(context: Context, id: String, image: AppCompatImageView) {
+            val extStorage = context.getExternalFilesDir(null)
             if (!extStorage!!.exists()) {
                 extStorage.mkdirs()
             }
 
             val imgFile = File(extStorage, "%s.jpg".format(id))
             if (imgFile.exists()) {
-                val options = BitmapFactory.Options()
-                options.inJustDecodeBounds = true
-                BitmapFactory.decodeFile(imgFile.absolutePath, options)
-                val imageWidth = options.outWidth
-                val imageHeight = options.outHeight
-                val margins = act.resources.getDimensionPixelSize(R.dimen.padding_large) * 2
-                val resultWidth = MBCommonMethods.getScreenWidth(act) - margins
-                val resultHeight = ((resultWidth.toFloat() * imageHeight.toFloat()) / imageWidth.toFloat()).toInt()
-                sArray[0] = resultWidth
-                sArray[1] = resultHeight
-            } else {
-                val dimen = MBCommonMethods.getScreenWidth(act) / 2
-                sArray[0] = dimen
-                sArray[1] = dimen
+                image.setImageBitmap(BitmapFactory.decodeFile(imgFile.absolutePath))
             }
         }
 
-        return sArray
-    }
+        fun getImageSizeFullScreen(act: FragmentActivity, id: String): Array<Int> {
+            val sArray = arrayOf(0, 0)
+            val isActivityInForeground = act.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!act.isFinishing && isActivityInForeground) {
+                val extStorage = act.getExternalFilesDir(null)
+                if (!extStorage!!.exists()) {
+                    extStorage.mkdirs()
+                }
 
-    fun getImageSizeCenter(act: FragmentActivity, id: String): Array<Int> {
-        val sArray = arrayOf(0, 0)
-        val isActivityInForeground = act.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-        if (!act.isFinishing && isActivityInForeground) {
-            val extStorage = act.getExternalFilesDir(null)
-            if (!extStorage!!.exists()) {
-                extStorage.mkdirs()
-            }
-
-            val imgFile = File(extStorage, "%s.jpg".format(id))
-            if (imgFile.exists()) {
-                val options = BitmapFactory.Options()
-                options.inJustDecodeBounds = true
-                BitmapFactory.decodeFile(imgFile.absolutePath, options)
-                val imageWidth = options.outWidth
-                val imageHeight = options.outHeight
-                val resultHeight = MBCommonMethods.getScreenWidth(act) / 3
-                val resultWidth = ((imageWidth.toFloat() * resultHeight.toFloat()) / imageHeight.toFloat()).toInt()
-                sArray[0] = resultWidth
-                sArray[1] = resultHeight
-            } else {
-                val dimen = MBCommonMethods.getScreenWidth(act) / 2
-                sArray[0] = dimen
-                sArray[1] = dimen
-            }
-        }
-
-        return sArray
-    }
-
-    fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?, message_id: String) {
-        val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
-        if (!activity.isFinishing && isActivityInForeground) {
-            if (cta != null) {
-                if (cta.action_type == MBIAMConstants.ACTION_LINK) {
-                    try {
-                        val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(cta.action))
-                        activity.startActivity(intent)
-                    } catch (exception: ActivityNotFoundException) {
-                        Log.d("MBMessages", "Activity not found for handling content")
-                    }
+                val imgFile = File(extStorage, "%s.jpg".format(id))
+                if (imgFile.exists()) {
+                    val options = BitmapFactory.Options()
+                    options.inJustDecodeBounds = true
+                    BitmapFactory.decodeFile(imgFile.absolutePath, options)
+                    val imageWidth = options.outWidth
+                    val imageHeight = options.outHeight
+                    val margins = act.resources.getDimensionPixelSize(R.dimen.padding_large) * 2
+                    val resultWidth = MBCommonMethods.getScreenWidth(act) - margins
+                    val resultHeight = ((resultWidth.toFloat() * imageHeight.toFloat()) / imageWidth.toFloat()).toInt()
+                    sArray[0] = resultWidth
+                    sArray[1] = resultHeight
                 } else {
-                    clickListener?.onCTAClicked(cta)
+                    val dimen = MBCommonMethods.getScreenWidth(act) / 2
+                    sArray[0] = dimen
+                    sArray[1] = dimen
                 }
             }
 
-            MBMessagesMetrics.trackInteractionMessage(activity.applicationContext, message_id)
+            return sArray
+        }
 
-            fragDialog.dismiss()
+        fun getImageSizeCenter(act: FragmentActivity, id: String): Array<Int> {
+            val sArray = arrayOf(0, 0)
+            val isActivityInForeground = act.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!act.isFinishing && isActivityInForeground) {
+                val extStorage = act.getExternalFilesDir(null)
+                if (!extStorage!!.exists()) {
+                    extStorage.mkdirs()
+                }
+
+                val imgFile = File(extStorage, "%s.jpg".format(id))
+                if (imgFile.exists()) {
+                    val options = BitmapFactory.Options()
+                    options.inJustDecodeBounds = true
+                    BitmapFactory.decodeFile(imgFile.absolutePath, options)
+                    val imageWidth = options.outWidth
+                    val imageHeight = options.outHeight
+                    val resultHeight = MBCommonMethods.getScreenWidth(act) / 3
+                    val resultWidth = ((imageWidth.toFloat() * resultHeight.toFloat()) / imageHeight.toFloat()).toInt()
+                    sArray[0] = resultWidth
+                    sArray[1] = resultHeight
+                } else {
+                    val dimen = MBCommonMethods.getScreenWidth(act) / 2
+                    sArray[0] = dimen
+                    sArray[1] = dimen
+                }
+            }
+
+            return sArray
+        }
+
+        fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?, message_id: String) {
+            val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            if (!activity.isFinishing && isActivityInForeground) {
+                if (cta != null) {
+                    if (cta.action_type == MBIAMConstants.ACTION_LINK) {
+                        try {
+                            val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(cta.action))
+                            activity.startActivity(intent)
+                        } catch (exception: ActivityNotFoundException) {
+                            Log.d("MBMessages", "Activity not found for handling content")
+                        }
+                    } else {
+                        clickListener?.onCTAClicked(cta)
+                    }
+                }
+
+                MBMessagesMetrics.trackInteractionMessage(activity.applicationContext, message_id)
+
+                fragDialog.dismiss()
+            }
         }
     }
 
