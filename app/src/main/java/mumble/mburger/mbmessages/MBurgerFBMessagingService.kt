@@ -1,4 +1,4 @@
-package mumble.mburger.mbmessages.mpush
+package mumble.mburger.mbmessages
 
 import android.content.Intent
 import com.google.firebase.messaging.FirebaseMessagingService
