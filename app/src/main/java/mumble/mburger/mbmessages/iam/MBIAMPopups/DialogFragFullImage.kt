@@ -17,11 +17,11 @@ import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 
 class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
 
-    lateinit var father: MBMessagesManager
+    lateinit var father: MBMessagesManager.Companion
     lateinit var content: MBMessageIAM
     lateinit var mbMessage: MBMessage
 
-    fun initialize(father: MBMessagesManager, mbMessage: MBMessage, content: MBMessageIAM) {
+    fun initialize(father: MBMessagesManager.Companion, mbMessage: MBMessage, content: MBMessageIAM) {
         this.father = father
         this.content = content
         this.mbMessage = mbMessage

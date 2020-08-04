@@ -20,7 +20,7 @@ import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
 class DialogFragTop : DialogFragment() {
 
-    lateinit var father: MBMessagesManager
+    lateinit var father: MBMessagesManager.Companion
     lateinit var content: MBMessageIAM
     lateinit var mbMessage: MBMessage
 
@@ -33,7 +33,7 @@ class DialogFragTop : DialogFragment() {
     var highestPoint = -1f
     var threshold = -1f
 
-    fun initialize(father: MBMessagesManager, mbMessage: MBMessage, content: MBMessageIAM) {
+    fun initialize(father: MBMessagesManager.Companion, mbMessage: MBMessage, content: MBMessageIAM) {
         this.father = father
         this.content = content
         this.mbMessage = mbMessage

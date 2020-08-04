@@ -89,9 +89,9 @@ internal class MBIAMAsyncTask_getMessages : AsyncTask<Void, Void, Void> {
             MBAMActivityUtils.sendBroadcastMessage(weakContext.get()!!, i)
         } else {
             if (error != null) {
-                listener!!.onCampaignError(error!!)
+                listener!!.onMessagesError(error!!)
             } else {
-                listener!!.onCampaignObtained(MBMessages)
+                listener!!.onMessagesObtained(MBMessages)
             }
         }
     }
