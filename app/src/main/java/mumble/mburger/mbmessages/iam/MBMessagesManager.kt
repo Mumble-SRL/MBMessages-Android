@@ -230,7 +230,7 @@ class MBMessagesManager {
                 val ids = getSeenIds(activity)
                 for (i in 0 until MBMessages.size) {
                     val mbMessage = MBMessages[i]
-                    if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM)) {
+                    if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM) && (mbMessage.automation == 0)) {
                         val content = mbMessage.content as MBMessageIAM
                         if (debugMode) {
                             currentPosition = i
