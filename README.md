@@ -137,3 +137,9 @@ Lastly on the activity you use to call from the notification (mainly your `andro
 ```kotlin
 MBMessagesMetrics.checkOpenedFromPush(applicationContext, getIntent())
 ```
+
+
+
+# Automation
+
+If messages have automation enabled they will be ignored and managed by the [MBAutomationKotlin SDK](https://github.com/Mumble-SRL/MBAutomation-Android) so make sure to include and configure the automation SDK correctly.
