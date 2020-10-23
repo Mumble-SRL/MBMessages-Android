@@ -110,7 +110,7 @@ With this plugin you can also manage the push notification section of MBurger, t
 
 # Message Metrics
 
-Using `MBMessages` gives you also the chanche to collect informations about your user and the push, those will be displyed on the [MBurger](https://mburger.cloud/) dashboard. As described in the prervious paragraph, in order for this to function, you need to configure push notification receivement as described below:
+Using `MBMessages` gives you also the chanche to collect informations about your user and the push, those will be displayed on the [MBurger](https://mburger.cloud/) dashboard. As described in the prervious paragraph, in order for this to function, you need to configure push notification receivement as described below:
 
 The push service must extend `MBurgerFBMessagingService` instead of `FirebaseMessagingService`, then implement this method which is a wrapper around the standard `onMessageReceived` for Firebase:
 

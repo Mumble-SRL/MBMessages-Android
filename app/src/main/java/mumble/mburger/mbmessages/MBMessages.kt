@@ -40,16 +40,19 @@ class MBMessages : MBIAMMBMessageListener, MBPlugin() {
 
     override fun onMessagesObtained(messages: ArrayList<MBMessage>?) {
         initialized = true
-        MBMessagesManager.MBMessages = messages!!
         initListener?.onInitialized()
 
+        val noAutomationMessages = ArrayList<MBMessage>()
         val automationMessages = ArrayList<MBMessage>()
-        for (message in messages) {
+        for (message in messages!!) {
             if (message.automation == 1) {
                 automationMessages.add(message)
+            }else{
+                noAutomationMessages.add(message)
             }
         }
 
+        MBMessagesManager.MBMessages = noAutomationMessages
         MBPluginsManager.messagesReceived(automationMessages, false)
     }
 

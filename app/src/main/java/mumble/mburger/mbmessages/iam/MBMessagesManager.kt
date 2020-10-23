@@ -1,5 +1,7 @@
 package mumble.mburger.mbmessages.iam
 
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -14,6 +16,7 @@ import android.widget.Space
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.app.NotificationCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.widget.ImageViewCompat
@@ -33,6 +36,7 @@ import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 import org.json.JSONArray
 import java.io.File
+import kotlin.random.Random
 
 
 class MBMessagesManager {
@@ -465,6 +469,25 @@ class MBMessagesManager {
 
                 fragDialog.dismiss()
             }
+        }
+
+        fun showNotification(context: Context, channel_id: String, small_icon: Int, message: MBMessage) {
+            val nId = Random.nextInt()
+            val pm = context.packageManager
+            val intent = pm.getLaunchIntentForPackage(context.packageName)
+            val contentIntent = PendingIntent.getActivity(context, nId, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+            val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            val notificationBuilder = NotificationCompat.Builder(context, channel_id)
+            notificationBuilder.setContentTitle(message.title)
+                    .setSmallIcon(small_icon)
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(message.description))
+                    .setAutoCancel(true)
+                    .setContentText(message.description)
+                    .setContentIntent(contentIntent)
+
+            mNotificationManager.notify(nId, notificationBuilder.build())
         }
     }
 
