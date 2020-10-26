@@ -6,9 +6,8 @@ import mumble.mburger.mbmessages.iam.MBIAMAsyncTasks.MBIAMAsyncTask_getMessages
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
 import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBIAMMBMessageListener
 import mumble.mburger.mbmessages.iam.MBIAMResultsListener.MBMessagesPluginInitialized
-import mumble.mburger.mbmessages.iam.MBMessagesManager
-import mumble.mburger.sdk.kt.Common.MBPluginsManager
 import mumble.mburger.sdk.kt.MBPlugins.MBPlugin
+import mumble.mburger.sdk.kt.MBPlugins.MBPluginsManager
 
 class MBMessages : MBIAMMBMessageListener, MBPlugin() {
 

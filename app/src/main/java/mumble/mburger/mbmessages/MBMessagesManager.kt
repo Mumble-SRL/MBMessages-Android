@@ -1,5 +1,6 @@
-package mumble.mburger.mbmessages.iam
+package mumble.mburger.mbmessages
 
+import android.app.AlarmManager
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
@@ -8,6 +9,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -23,11 +25,11 @@ import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
-import mumble.mburger.mbmessages.R
 import mumble.mburger.mbmessages.iam.MBIAMConstants.MBIAMConstants
 import mumble.mburger.mbmessages.iam.MBIAMData.CTA
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessageIAM
+import mumble.mburger.mbmessages.iam.MBIAMData.MBMessagePush
 import mumble.mburger.mbmessages.iam.MBIAMPopups.DialogFragBottom
 import mumble.mburger.mbmessages.iam.MBIAMPopups.DialogFragCenter
 import mumble.mburger.mbmessages.iam.MBIAMPopups.DialogFragFullImage
@@ -36,6 +38,8 @@ import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 import org.json.JSONArray
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -472,6 +476,51 @@ class MBMessagesManager {
         }
 
         fun showNotification(context: Context, channel_id: String, small_icon: Int, message: MBMessage) {
+            if (message.content is MBMessagePush) {
+                val ids = getSeenIds(context)
+                val content = message.content as MBMessagePush
+                if (ids.contains(content.id)) {
+                    return
+                } else {
+                    if (message.send_after_days > 0) {
+                        val calNow = Calendar.getInstance()
+                        calNow.add(Calendar.DAY_OF_YEAR, message.send_after_days)
+                        scheduleNotification(context, channel_id, small_icon, message.id, calNow.timeInMillis, content)
+                    } else {
+                        showLocal(context, channel_id, small_icon, message.id, content.title!!, content.body!!)
+                    }
+                }
+            }
+        }
+
+        fun scheduleNotification(context: Context, channel_id: String, small_icon: Int, message_id: Long,
+                                 new_millis: Long, content: MBMessagePush) {
+            val reqCode = message_id.toInt()
+            val intent = Intent(context, AlarmReceiverScheduledNotifications::class.java)
+            intent.putExtra("channel_id", channel_id)
+            intent.putExtra("small_icon", small_icon)
+            intent.putExtra("title", content.title)
+            intent.putExtra("body", content.body)
+            intent.putExtra("id", message_id)
+
+            val pendingIntent = PendingIntent.getBroadcast(context, reqCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(pendingIntent)
+            if (Build.VERSION.SDK_INT >= 19) {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, new_millis, pendingIntent)
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, new_millis, pendingIntent)
+            }
+        }
+
+        fun showLocal(context: Context, channel_id: String, small_icon: Int, message_id: Long,
+                      title: String, body: String) {
+
+            val ids = getSeenIds(context)
+            if (ids.contains(message_id)) {
+                return
+            }
+
             val nId = Random.nextInt()
             val pm = context.packageManager
             val intent = pm.getLaunchIntentForPackage(context.packageName)
@@ -480,14 +529,15 @@ class MBMessagesManager {
             val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
             val notificationBuilder = NotificationCompat.Builder(context, channel_id)
-            notificationBuilder.setContentTitle(message.title)
+            notificationBuilder.setContentTitle(title)
                     .setSmallIcon(small_icon)
-                    .setStyle(NotificationCompat.BigTextStyle().bigText(message.description))
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(body))
                     .setAutoCancel(true)
-                    .setContentText(message.description)
+                    .setContentText(body)
                     .setContentIntent(contentIntent)
 
             mNotificationManager.notify(nId, notificationBuilder.build())
+            addMessageSeen(message_id, context)
         }
     }
 

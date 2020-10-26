@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.dialog_frag_bottom.*
 import mumble.mburger.mbmessages.R
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessageIAM
-import mumble.mburger.mbmessages.iam.MBMessagesManager
+import mumble.mburger.mbmessages.MBMessagesManager
 import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
