@@ -15,7 +15,7 @@ class AlarmReceiverScheduledNotifications : BroadcastReceiver() {
             val body = intent.getStringExtra("body")
             val id = intent.getLongExtra("id", -1)
 
-            MBMessagesManager.showLocal(context!!, channel_id!!, small_icon, id, title!!, body!!)
+            MBMessagesManager.showLocal(context!!, channel_id!!, small_icon, id, title, body)
         }
     }
 }

@@ -487,7 +487,7 @@ class MBMessagesManager {
                         calNow.add(Calendar.DAY_OF_YEAR, message.send_after_days)
                         scheduleNotification(context, channel_id, small_icon, message.id, calNow.timeInMillis, content)
                     } else {
-                        showLocal(context, channel_id, small_icon, message.id, content.title!!, content.body!!)
+                        showLocal(context, channel_id, small_icon, message.id, content.title, content.body)
                     }
                 }
             }
@@ -514,11 +514,21 @@ class MBMessagesManager {
         }
 
         fun showLocal(context: Context, channel_id: String, small_icon: Int, message_id: Long,
-                      title: String, body: String) {
+                      title: String?, body: String?) {
 
             val ids = getSeenIds(context)
             if (ids.contains(message_id)) {
                 return
+            }
+
+            var curTitle = title
+            if(curTitle == null){
+                curTitle = "";
+            }
+
+            var curBody = body
+            if(curBody == null){
+                curBody = "";
             }
 
             val nId = Random.nextInt()
@@ -529,11 +539,11 @@ class MBMessagesManager {
             val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
             val notificationBuilder = NotificationCompat.Builder(context, channel_id)
-            notificationBuilder.setContentTitle(title)
+            notificationBuilder.setContentTitle(curTitle)
                     .setSmallIcon(small_icon)
-                    .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(curBody))
                     .setAutoCancel(true)
-                    .setContentText(body)
+                    .setContentText(curBody)
                     .setContentIntent(contentIntent)
 
             mNotificationManager.notify(nId, notificationBuilder.build())
