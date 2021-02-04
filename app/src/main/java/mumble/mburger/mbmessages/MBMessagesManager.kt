@@ -37,6 +37,7 @@ import mumble.mburger.mbmessages.iam.MBIAMPopups.DialogFragTop
 import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -163,13 +164,12 @@ class MBMessagesManager {
         fun startFlow(mbMessage: MBMessage, activity: FragmentActivity) {
             val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
             if (!activity.isFinishing && isActivityInForeground) {
-                val ids = getSeenIds(activity)
                 if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM)) {
                     val content = mbMessage.content as MBMessageIAM
                     if (debugMode) {
                         show(activity, mbMessage, content)
                     } else {
-                        if (!ids.contains(content.id)) {
+                        if (canShow(activity.applicationContext, content.id, mbMessage.repeat)) {
                             show(activity, mbMessage, content)
                         }
                     }
@@ -177,16 +177,66 @@ class MBMessagesManager {
             }
         }
 
-        fun getSeenIds(context: Context): ArrayList<Long> {
-            val ids = ArrayList<Long>()
+        fun getSeenMapIds(context: Context): ArrayList<MutableMap<Long, Int>> {
+            val maps = ArrayList<MutableMap<Long, Int>>()
             val jMessagesSeen = JSONArray(MBCommonMethods.getSharedPreferences(context)!!
                     .getString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, "[]"))
 
             for (i in 0 until jMessagesSeen.length()) {
-                ids.add(jMessagesSeen.getLong(i))
+                val map = mutableMapOf<Long, Int>()
+                if (jMessagesSeen.get(i) is JSONObject) {
+                    val jObj = jMessagesSeen.getJSONObject(i)
+                    map[jObj.getLong("id")] = jObj.getInt("repeated")
+                    maps.add(map)
+                } else {
+                    return maps
+                }
             }
 
-            return ids
+            return maps
+        }
+
+        fun addMessageSeen(id: Long, context: Context) {
+            val mapIds = getSeenMapIds(context)
+            var found = false
+            for (map in mapIds) {
+                if (map.containsKey(id)) {
+                    val repeated = if(map[id] != null) map[id]!! else 0
+                    map[id] = repeated + 1
+                    found = true
+                    break
+                }
+            }
+
+            if (!found) {
+                val mp = mutableMapOf<Long, Int>()
+                mp[id] = 1
+                mapIds.add(mp)
+            }
+
+            val jMessagesSeen = JSONArray()
+            for (map in mapIds) {
+                val id = map.keys.toList()[0]
+                val jObj = JSONObject().put("id", id)
+                        .put("repeated", map[id])
+                jMessagesSeen.put(jObj)
+            }
+
+            MBCommonMethods.getSharedPreferencesEditor(context)!!
+                    .putString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, jMessagesSeen.toString()).commit()
+        }
+
+        fun canShow(context: Context, id: Long, repeat: Int): Boolean {
+            val mapIds = getSeenMapIds(context)
+            for (map in mapIds) {
+                if (map.containsKey(id)) {
+                    val repeated = if(map[id] != null) map[id]!! else 0
+                    if(repeated == 0) return true
+                    return repeated < repeat
+                }
+            }
+
+            return true
         }
 
         private fun show(activity: FragmentActivity, mbMessage: MBMessage, content: MBMessageIAM) {
@@ -221,21 +271,10 @@ class MBMessagesManager {
             }
         }
 
-        fun addMessageSeen(id: Long, context: Context) {
-            val jMessagesSeen = JSONArray(MBCommonMethods.getSharedPreferences(context)!!
-                    .getString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, "[]"))
-
-            jMessagesSeen.put(id)
-
-            MBCommonMethods.getSharedPreferencesEditor(context)!!
-                    .putString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, jMessagesSeen.toString()).commit()
-        }
-
         fun startFlow(activity: FragmentActivity) {
             val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
             if (!activity.isFinishing && isActivityInForeground) {
                 currentPosition = 0
-                val ids = getSeenIds(activity)
                 for (i in 0 until MBMessages.size) {
                     val mbMessage = MBMessages[i]
                     if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM) && (mbMessage.automation == 0)) {
@@ -245,7 +284,7 @@ class MBMessagesManager {
                             show(activity, mbMessage, content)
                             break
                         } else {
-                            if (!ids.contains(content.id)) {
+                            if (canShow(activity.applicationContext, content.id, mbMessage.repeat)) {
                                 currentPosition = i
                                 show(activity, mbMessage, content)
                                 break
@@ -259,7 +298,6 @@ class MBMessagesManager {
         fun continueFlow(activity: FragmentActivity) {
             val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
             if (!activity.isFinishing && isActivityInForeground) {
-                val ids = getSeenIds(activity)
                 for (i in (currentPosition + 1) until MBMessages.size) {
                     val mbMessage = MBMessages[i]
                     if ((mbMessage.type == MBIAMConstants.CAMPAIGN_MESSAGE) && (mbMessage.content is MBMessageIAM)) {
@@ -269,7 +307,7 @@ class MBMessagesManager {
                             show(activity, mbMessage, content)
                             break
                         } else {
-                            if (!ids.contains(content.id)) {
+                            if (canShow(activity.applicationContext, content.id, mbMessage.repeat)) {
                                 currentPosition = i
                                 show(activity, mbMessage, content)
                                 break
@@ -477,9 +515,8 @@ class MBMessagesManager {
 
         fun showNotification(context: Context, channel_id: String, small_icon: Int, message: MBMessage) {
             if (message.content is MBMessagePush) {
-                val ids = getSeenIds(context)
                 val content = message.content as MBMessagePush
-                if (ids.contains(content.id)) {
+                if (!canShow(context, message.id, 0)) {
                     return
                 } else {
                     if (message.send_after_days > 0) {
@@ -516,18 +553,17 @@ class MBMessagesManager {
         fun showLocal(context: Context, channel_id: String, small_icon: Int, message_id: Long,
                       title: String?, body: String?) {
 
-            val ids = getSeenIds(context)
-            if (ids.contains(message_id)) {
+            if (!canShow(context, message_id, 0)) {
                 return
             }
 
             var curTitle = title
-            if(curTitle == null){
+            if (curTitle == null) {
                 curTitle = "";
             }
 
             var curBody = body
-            if(curBody == null){
+            if (curBody == null) {
                 curBody = "";
             }
 
