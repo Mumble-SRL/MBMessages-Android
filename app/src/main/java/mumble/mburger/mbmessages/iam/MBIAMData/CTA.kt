@@ -6,5 +6,5 @@ class CTA(
         var text: String,
         var text_color: Int?,
         var background_color: Int?,
-        var action_type: String,
-        var action: String) : Serializable
+        var action_type: String?,
+        var action: String?) : Serializable

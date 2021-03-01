@@ -173,12 +173,19 @@ class MBMessagesParser {
                     downloadImage(context, id.toString(), image)
                 }
 
-                if (MBCommonMethods.isJSONOk(jsonObject, "cta_text") &&
-                        MBCommonMethods.isJSONOk(jsonObject, "cta_action_type") &&
-                        MBCommonMethods.isJSONOk(jsonObject, "cta_action")) {
-
+                if (MBCommonMethods.isJSONOk(jsonObject, "cta_text")) {
+                    var action_type:String? = null
+                    var action:String? = null
                     var text_color = Color.BLACK
                     var bg_color = Color.WHITE
+
+                    if (MBCommonMethods.isJSONOk(jsonObject, "cta_action_type")) {
+                        action_type = jsonObject.getString("cta_action_type")
+                    }
+
+                    if (MBCommonMethods.isJSONOk(jsonObject, "cta_action")) {
+                        action = jsonObject.getString("cta_action")
+                    }
 
                     if (MBCommonMethods.isJSONOk(jsonObject, "cta_text_color")) {
                         text_color = Color.parseColor(jsonObject.getString("cta_text_color"))
@@ -189,16 +196,23 @@ class MBMessagesParser {
                     }
 
                     cta1 = CTA(jsonObject.getString("cta_text"), text_color,
-                            bg_color, jsonObject.getString("cta_action_type"),
-                            jsonObject.getString("cta_action"))
+                            bg_color, action_type, action)
                 }
 
-                if (MBCommonMethods.isJSONOk(jsonObject, "cta2_text") &&
-                        MBCommonMethods.isJSONOk(jsonObject, "cta2_action_type") &&
-                        MBCommonMethods.isJSONOk(jsonObject, "cta2_action")) {
+                if (MBCommonMethods.isJSONOk(jsonObject, "cta2_text")) {
 
+                    var action_type:String? = null
+                    var action:String? = null
                     var text_color = Color.BLACK
                     var bg_color = Color.WHITE
+
+                    if (MBCommonMethods.isJSONOk(jsonObject, "cta2_action_type")) {
+                        action_type = jsonObject.getString("cta2_action_type")
+                    }
+
+                    if (MBCommonMethods.isJSONOk(jsonObject, "cta2_action")) {
+                        action = jsonObject.getString("cta2_action")
+                    }
 
                     if (MBCommonMethods.isJSONOk(jsonObject, "cta2_text_color")) {
                         text_color = Color.parseColor(jsonObject.getString("cta2_text_color"))
@@ -209,8 +223,7 @@ class MBMessagesParser {
                     }
 
                     cta2 = CTA(jsonObject.getString("cta2_text"), text_color,
-                            bg_color, jsonObject.getString("cta2_action_type"),
-                            jsonObject.getString("cta2_action"))
+                            bg_color, action_type, action)
                 }
 
             } catch (e: JSONException) {

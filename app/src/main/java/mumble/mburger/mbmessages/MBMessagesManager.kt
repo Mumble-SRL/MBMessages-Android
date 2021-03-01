@@ -201,7 +201,7 @@ class MBMessagesManager {
             var found = false
             for (map in mapIds) {
                 if (map.containsKey(id)) {
-                    val repeated = if(map[id] != null) map[id]!! else 0
+                    val repeated = if (map[id] != null) map[id]!! else 0
                     map[id] = repeated + 1
                     found = true
                     break
@@ -230,8 +230,8 @@ class MBMessagesManager {
             val mapIds = getSeenMapIds(context)
             for (map in mapIds) {
                 if (map.containsKey(id)) {
-                    val repeated = if(map[id] != null) map[id]!! else 0
-                    if(repeated == 0) return true
+                    val repeated = if (map[id] != null) map[id]!! else 0
+                    if (repeated == 0) return true
                     return repeated < repeat
                 }
             }
@@ -495,15 +495,17 @@ class MBMessagesManager {
             val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
             if (!activity.isFinishing && isActivityInForeground) {
                 if (cta != null) {
-                    if (cta.action_type == MBIAMConstants.ACTION_LINK) {
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(cta.action))
-                            activity.startActivity(intent)
-                        } catch (exception: ActivityNotFoundException) {
-                            Log.d("MBMessages", "Activity not found for handling content")
+                    if((cta.action_type != null) && (cta.action != null)){
+                        if (cta.action_type == MBIAMConstants.ACTION_LINK) {
+                            try {
+                                val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(cta.action))
+                                activity.startActivity(intent)
+                            } catch (exception: ActivityNotFoundException) {
+                                Log.d("MBMessages", "Activity not found for handling content")
+                            }
+                        } else {
+                            clickListener?.onCTAClicked(cta)
                         }
-                    } else {
-                        clickListener?.onCTAClicked(cta)
                     }
                 }
 
@@ -522,16 +524,16 @@ class MBMessagesManager {
                     if (message.send_after_days > 0) {
                         val calNow = Calendar.getInstance()
                         calNow.add(Calendar.DAY_OF_YEAR, message.send_after_days)
-                        scheduleNotification(context, channel_id, small_icon, message.id, calNow.timeInMillis, content)
+                        scheduleNotification(context, channel_id, small_icon, message.id, calNow.timeInMillis, content, message.repeat)
                     } else {
-                        showLocal(context, channel_id, small_icon, message.id, content.title, content.body)
+                        showLocal(context, channel_id, small_icon, message.id, content.title, content.body, message.repeat)
                     }
                 }
             }
         }
 
         fun scheduleNotification(context: Context, channel_id: String, small_icon: Int, message_id: Long,
-                                 new_millis: Long, content: MBMessagePush) {
+                                 new_millis: Long, content: MBMessagePush, repeat: Int) {
             val reqCode = message_id.toInt()
             val intent = Intent(context, AlarmReceiverScheduledNotifications::class.java)
             intent.putExtra("channel_id", channel_id)
@@ -539,6 +541,7 @@ class MBMessagesManager {
             intent.putExtra("title", content.title)
             intent.putExtra("body", content.body)
             intent.putExtra("id", message_id)
+            intent.putExtra("repeat", repeat)
 
             val pendingIntent = PendingIntent.getBroadcast(context, reqCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -551,9 +554,9 @@ class MBMessagesManager {
         }
 
         fun showLocal(context: Context, channel_id: String, small_icon: Int, message_id: Long,
-                      title: String?, body: String?) {
+                      title: String?, body: String?, repeat: Int) {
 
-            if (!canShow(context, message_id, 0)) {
+            if (!canShow(context, message_id, repeat)) {
                 return
             }
 

@@ -14,8 +14,9 @@ class AlarmReceiverScheduledNotifications : BroadcastReceiver() {
             val title = intent.getStringExtra("title")
             val body = intent.getStringExtra("body")
             val id = intent.getLongExtra("id", -1)
+            val repeat = intent.getIntExtra("repeat", 0)
 
-            MBMessagesManager.showLocal(context!!, channel_id!!, small_icon, id, title, body)
+            MBMessagesManager.showLocal(context!!, channel_id!!, small_icon, id, title, body, repeat)
         }
     }
 }
