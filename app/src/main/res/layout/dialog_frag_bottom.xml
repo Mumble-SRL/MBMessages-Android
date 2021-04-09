@@ -5,10 +5,13 @@
     android:layout_height="match_parent">
 
     <View
+        android:id="@+id/dfrag_bottom_behind_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
-        android:clickable="true"
+        android:focusable="false"
+        android:clickable="false"
+        android:visibility="gone"
         android:importantForAccessibility="no" />
 
     <LinearLayout

@@ -7,15 +7,19 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.dialog_frag_bottom.*
+import kotlinx.android.synthetic.main.dialog_frag_top.*
+import mumble.mburger.mbmessages.MBMessagesManager
 import mumble.mburger.mbmessages.R
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessageIAM
-import mumble.mburger.mbmessages.MBMessagesManager
 import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
@@ -43,11 +47,27 @@ class DialogFragBottom : DialogFragment() {
 
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        if (content.is_blocking) {
+            isCancelable = false
+            dialog?.setCancelable(false)
+        }
+
         return v
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if(content.is_blocking){
+            dfrag_bottom_behind_view.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black_very_alpha))
+            dfrag_bottom_behind_view.isFocusable = true
+            dfrag_bottom_behind_view.isClickable = true
+            dfrag_bottom_behind_view.visibility = View.INVISIBLE
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                dfrag_bottom_behind_view.visibility = View.VISIBLE
+            }, 700)
+        }
 
         val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 5
         dfrag_bottom_img.layoutParams.width = dimen
@@ -57,11 +77,11 @@ class DialogFragBottom : DialogFragment() {
         dfrag_bottom_drag_layout.layoutParams.height = dragDimen
 
         dfrag_bottom_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString())
+            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString(), content.is_blocking)
         }
 
         dfrag_bottom_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString())
+            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString(), content.is_blocking)
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_bottom_layout, dfrag_bottom_txt_title,
@@ -131,46 +151,48 @@ class DialogFragBottom : DialogFragment() {
     }
 
     fun setLayout() {
-        dfrag_bottom_drag_layout.setOnTouchListener { v, event ->
-            when (event.actionMasked) {
-                MotionEvent.ACTION_MOVE -> {
-                    val tmpY = event.rawY
-                    if (tmpY > highestPoint) {
-                        y = tmpY
-                        if (event.action == MotionEvent.ACTION_MOVE) {
-                            dfrag_bottom_whole_layout.y = (y - resources.getDimensionPixelSize(R.dimen.padding_mmlarge) * 2)
-                        }
+        if (!content.is_blocking) {
+            dfrag_bottom_drag_layout.setOnTouchListener { v, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_MOVE -> {
+                        val tmpY = event.rawY
+                        if (tmpY > highestPoint) {
+                            y = tmpY
+                            if (event.action == MotionEvent.ACTION_MOVE) {
+                                dfrag_bottom_whole_layout.y = (y - resources.getDimensionPixelSize(R.dimen.padding_mmlarge) * 2)
+                            }
 
-                        if (++i > 50) {
+                            if (++i > 50) {
+                                false
+                            }
+                        } else {
                             false
                         }
-                    } else {
-                        false
-                    }
 
-                    true
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    if (y > threshold) {
-                        hideDown()
-                        true
-                    } else {
-                        returnUp()
                         true
                     }
-                }
 
-                else -> true
+                    MotionEvent.ACTION_UP -> {
+                        if (y > threshold) {
+                            hideDown()
+                            true
+                        } else {
+                            returnUp()
+                            true
+                        }
+                    }
+
+                    else -> true
+                }
             }
+
+            dfrag_bottom_drag_layout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    highestPoint = dfrag_bottom_whole_layout.y + resources.getDimensionPixelSize(R.dimen.padding_mmlarge)
+                    threshold = highestPoint + (dfrag_bottom_whole_layout.height / 2)
+                    dfrag_bottom_drag_layout.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+            })
         }
-
-        dfrag_bottom_drag_layout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                highestPoint = dfrag_bottom_whole_layout.y + resources.getDimensionPixelSize(R.dimen.padding_mmlarge)
-                threshold = highestPoint + (dfrag_bottom_whole_layout.height / 2)
-                dfrag_bottom_drag_layout.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })
     }
 }

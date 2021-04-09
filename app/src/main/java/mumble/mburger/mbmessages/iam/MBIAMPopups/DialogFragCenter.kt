@@ -9,10 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import kotlinx.android.synthetic.main.dialog_frag_center.*
+import mumble.mburger.mbmessages.MBMessagesManager
 import mumble.mburger.mbmessages.R
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessageIAM
-import mumble.mburger.mbmessages.MBMessagesManager
 import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 
 class DialogFragCenter : androidx.fragment.app.DialogFragment() {
@@ -31,6 +31,11 @@ class DialogFragCenter : androidx.fragment.app.DialogFragment() {
         val v = inflater.inflate(R.layout.dialog_frag_center, container, false)
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        if (content.is_blocking) {
+            isCancelable = false
+            dialog?.setCancelable(false)
+        }
+
         return v
     }
 
@@ -46,15 +51,19 @@ class DialogFragCenter : androidx.fragment.app.DialogFragment() {
         }
 
         dfrag_center_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString())
+            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString(), content.is_blocking)
         }
 
         dfrag_center_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString())
+            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString(), content.is_blocking)
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_center_layout, dfrag_center_txt_title,
                 dfrag_center_txt_message, dfrag_center_img, dfrag_center_btn_1, dfrag_center_btn_2, null, dfrag_center_close)
+
+        if (content.is_blocking) {
+            dfrag_center_close.visibility = View.GONE
+        }
 
         MBMessagesMetrics.trackShowMessage(requireContext(), mbMessage.id.toString())
     }

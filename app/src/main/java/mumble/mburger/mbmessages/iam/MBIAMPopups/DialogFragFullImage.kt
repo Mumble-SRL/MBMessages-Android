@@ -31,6 +31,11 @@ class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
         val v = inflater.inflate(R.layout.dialog_frag_fullimage, container, false)
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        if (content.is_blocking) {
+            isCancelable = false
+            dialog?.setCancelable(false)
+        }
+
         return v
     }
 
@@ -46,16 +51,20 @@ class DialogFragFullImage : androidx.fragment.app.DialogFragment() {
         }
 
         dfrag_fullimage_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString())
+            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString(), content.is_blocking)
         }
 
         dfrag_fullimage_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString())
+            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString(), content.is_blocking)
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_fullimage_layout, null, null,
                 dfrag_fullimage_img, dfrag_fullimage_btn_1, dfrag_fullimage_btn_2, null,
                 dfrag_fullimage_close)
+
+        if(content.is_blocking){
+            dfrag_fullimage_close.visibility = View.GONE
+        }
 
         MBMessagesMetrics.trackShowMessage(requireContext(), mbMessage.id.toString())
     }

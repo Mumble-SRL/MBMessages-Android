@@ -130,6 +130,7 @@ class MBMessagesParser {
             var durationInSeconds: Int = -1
             var expiresAt: Long? = -1
             var image: String? = null
+            var is_blocking = false
 
             try {
                 if (MBCommonMethods.isJSONOk(jsonObject, "id")) {
@@ -171,6 +172,19 @@ class MBMessagesParser {
                 if (MBCommonMethods.isJSONOk(jsonObject, "image")) {
                     image = jsonObject.getString("image")
                     downloadImage(context, id.toString(), image)
+                }
+
+                if (MBCommonMethods.isJSONOk(jsonObject, "is_blocking")) {
+                    is_blocking = if(jsonObject.get("is_blocking") is Boolean){
+                        jsonObject.getBoolean("is_blocking")
+                    } else {
+                        if(jsonObject.get("is_blocking") is Int){
+                            jsonObject.getInt("is_blocking") == 1
+                        } else {
+                            val s_is_blocking = jsonObject.getString("is_blocking")
+                            s_is_blocking.toBoolean().or(false)
+                        }
+                    }
                 }
 
                 if (MBCommonMethods.isJSONOk(jsonObject, "cta_text")) {
@@ -231,7 +245,7 @@ class MBMessagesParser {
             }
 
             return MBMessageIAM(id, type, title, content, title_color, content_color, backgroundColor, null,
-                    null, cta1, cta2, durationInSeconds, expiresAt, image)
+                    null, cta1, cta2, durationInSeconds, expiresAt, image, is_blocking)
         }
 
         fun parsePush(jsonObject: JSONObject): MBMessagePush {

@@ -6,15 +6,18 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.dialog_frag_top.*
+import mumble.mburger.mbmessages.MBMessagesManager
 import mumble.mburger.mbmessages.R
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessage
 import mumble.mburger.mbmessages.iam.MBIAMData.MBMessageIAM
-import mumble.mburger.mbmessages.MBMessagesManager
 import mumble.mburger.mbmessages.metrics.MBMessagesMetrics
 import mumble.mburger.sdk.kt.Common.MBCommonMethods
 
@@ -44,25 +47,41 @@ class DialogFragTop : DialogFragment() {
 
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        if (content.is_blocking) {
+            isCancelable = false
+            dialog?.setCancelable(false)
+        }
+
         return v
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if(content.is_blocking){
+            dfrag_top_behind_view.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black_very_alpha))
+            dfrag_top_behind_view.isFocusable = true
+            dfrag_top_behind_view.isClickable = true
+            dfrag_top_behind_view.visibility = View.INVISIBLE
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                dfrag_top_behind_view.visibility = View.VISIBLE
+            }, 700)
+        }
+
         val dimen = MBCommonMethods.getScreenWidth(requireActivity()) / 5
         dfrag_top_img.layoutParams.width = dimen
         dfrag_top_img.layoutParams.height = dimen
 
-        val dragDimen = MBCommonMethods.getScreenWidth(requireActivity())/10
+        val dragDimen = MBCommonMethods.getScreenWidth(requireActivity()) / 10
         dfrag_top_drag_layout.layoutParams.height = dragDimen
 
         dfrag_top_btn_1.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString())
+            father.setClick(requireActivity(), this, content.cta1, mbMessage.id.toString(), content.is_blocking)
         }
 
         dfrag_top_btn_2.setOnClickListener {
-            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString())
+            father.setClick(requireActivity(), this, content.cta2, mbMessage.id.toString(), content.is_blocking)
         }
 
         father.putDataInIAM(requireContext(), content, dfrag_top_layout, dfrag_top_txt_title,
@@ -132,53 +151,55 @@ class DialogFragTop : DialogFragment() {
     }
 
     fun setLayout() {
-        dfrag_top_drag_layout.setOnTouchListener { v, event ->
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    downPoint = event.rawY
-                    true
-                }
+        if (!content.is_blocking) {
+            dfrag_top_drag_layout.setOnTouchListener { v, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        downPoint = event.rawY
+                        true
+                    }
 
-                MotionEvent.ACTION_MOVE -> {
-                    val tmpY = event.rawY
-                    if (tmpY < highestPoint) {
-                        y = tmpY
-                        val diff = downPoint - y
-                        downPoint = y
-                        if (event.action == MotionEvent.ACTION_MOVE) {
-                            dfrag_top_whole_layout.y = dfrag_top_whole_layout.y - diff
-                        }
+                    MotionEvent.ACTION_MOVE -> {
+                        val tmpY = event.rawY
+                        if (tmpY < highestPoint) {
+                            y = tmpY
+                            val diff = downPoint - y
+                            downPoint = y
+                            if (event.action == MotionEvent.ACTION_MOVE) {
+                                dfrag_top_whole_layout.y = dfrag_top_whole_layout.y - diff
+                            }
 
-                        if (++i > 50) {
+                            if (++i > 50) {
+                                false
+                            }
+                        } else {
                             false
                         }
-                    } else {
-                        false
-                    }
 
-                    true
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    if (y < threshold) {
-                        hideUp()
-                        true
-                    } else {
-                        returnDown()
                         true
                     }
-                }
 
-                else -> true
+                    MotionEvent.ACTION_UP -> {
+                        if (y < threshold) {
+                            hideUp()
+                            true
+                        } else {
+                            returnDown()
+                            true
+                        }
+                    }
+
+                    else -> true
+                }
             }
+
+            dfrag_top_drag_layout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    highestPoint = (MBCommonMethods.getStatusBarHeight(requireActivity()) + dfrag_top_whole_layout.height + resources.getDimensionPixelSize(R.dimen.padding_small)).toFloat()
+                    threshold = highestPoint / 2.5f
+                    dfrag_top_drag_layout.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+            })
         }
-
-        dfrag_top_drag_layout.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                highestPoint = (MBCommonMethods.getStatusBarHeight(requireActivity()) + dfrag_top_whole_layout.height + resources.getDimensionPixelSize(R.dimen.padding_small)).toFloat()
-                threshold = highestPoint / 2.5f
-                dfrag_top_drag_layout.viewTreeObserver.removeOnGlobalLayoutListener(this)
-            }
-        })
     }
 }

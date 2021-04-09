@@ -491,7 +491,7 @@ class MBMessagesManager {
             return sArray
         }
 
-        fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?, message_id: String) {
+        fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?, message_id: String, is_blocking:Boolean) {
             val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
             if (!activity.isFinishing && isActivityInForeground) {
                 if (cta != null) {
@@ -511,6 +511,7 @@ class MBMessagesManager {
 
                 MBMessagesMetrics.trackInteractionMessage(activity.applicationContext, message_id)
 
+                if(!is_blocking)
                 fragDialog.dismiss()
             }
         }

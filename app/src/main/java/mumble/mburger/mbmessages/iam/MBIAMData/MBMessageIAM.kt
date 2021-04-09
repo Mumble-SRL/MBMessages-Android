@@ -16,4 +16,5 @@ class MBMessageIAM(
         var cta2: CTA? = null,
         var durationInSeconds: Int,
         var expiresAt: Long? = null,
-        var image: String? = null) : Serializable
+        var image: String? = null,
+        var is_blocking: Boolean = false) : Serializable
