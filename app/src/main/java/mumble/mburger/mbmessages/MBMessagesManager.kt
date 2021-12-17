@@ -40,6 +40,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.random.Random
 
@@ -169,8 +170,8 @@ class MBMessagesManager {
                     if (debugMode) {
                         show(activity, mbMessage, content)
                     } else {
-                        if (canShow(activity.applicationContext, content.id, mbMessage.repeat)) {
-                            show(activity, mbMessage, content)
+                        if (canShow(activity.applicationContext, content.id, mbMessage.repeat, mbMessage.ends_at)) {
+                            show(activity, mbMessage, content, mbMessage)
                         }
                     }
                 }
@@ -226,13 +227,20 @@ class MBMessagesManager {
                     .putString(MBIAMConstants.PROPERTIES_MESSAGES_SEEN, jMessagesSeen.toString()).commit()
         }
 
-        fun canShow(context: Context, id: Long, repeat: Int): Boolean {
+        fun canShow(context: Context, id: Long, repeat: Int, ends_at: Long): Boolean {
             val mapIds = getSeenMapIds(context)
             for (map in mapIds) {
                 if (map.containsKey(id)) {
                     val repeated = if (map[id] != null) map[id]!! else 0
                     if (repeated == 0) return true
                     return repeated < repeat
+                }
+            }
+
+            //Added here ends_at check, to check if it's correct
+            if(ends_at != null){
+                if(System.currentTimeMillis() > TimeUnit.SECONDS.toMillis(ends_at)){
+                    return false;
                 }
             }
 
@@ -284,7 +292,7 @@ class MBMessagesManager {
                             show(activity, mbMessage, content)
                             break
                         } else {
-                            if (canShow(activity.applicationContext, content.id, mbMessage.repeat)) {
+                            if (canShow(activity.applicationContext, content.id, mbMessage.repeat, mbMessage.ends_at)) {
                                 currentPosition = i
                                 show(activity, mbMessage, content)
                                 break
@@ -307,14 +315,14 @@ class MBMessagesManager {
                             show(activity, mbMessage, content)
                             break
                         } else {
-                            if (canShow(activity.applicationContext, content.id, mbMessage.repeat)) {
+                            if (canShow(activity.applicationContext, content.id, mbMessage.repeat, mbMessage.ends_at)) {
                                 currentPosition = i
                                 show(activity, mbMessage, content)
                                 break
                             }
                         }
                     }
-                }
+                }x
             }
         }
 
@@ -491,11 +499,11 @@ class MBMessagesManager {
             return sArray
         }
 
-        fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?, message_id: String, is_blocking:Boolean) {
+        fun setClick(activity: FragmentActivity, fragDialog: DialogFragment, cta: CTA?, message_id: String, is_blocking: Boolean) {
             val isActivityInForeground = activity.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
             if (!activity.isFinishing && isActivityInForeground) {
                 if (cta != null) {
-                    if((cta.action_type != null) && (cta.action != null)){
+                    if ((cta.action_type != null) && (cta.action != null)) {
                         if (cta.action_type == MBIAMConstants.ACTION_LINK) {
                             try {
                                 val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(cta.action))
@@ -511,15 +519,15 @@ class MBMessagesManager {
 
                 MBMessagesMetrics.trackInteractionMessage(activity.applicationContext, message_id)
 
-                if(!is_blocking)
-                fragDialog.dismiss()
+                if (!is_blocking)
+                    fragDialog.dismiss()
             }
         }
 
         fun showNotification(context: Context, channel_id: String, small_icon: Int, message: MBMessage) {
             if (message.content is MBMessagePush) {
                 val content = message.content as MBMessagePush
-                if (!canShow(context, message.id, 0)) {
+                if (!canShow(context, message.id, 0, message.ends_at)) {
                     return
                 } else {
                     if (message.send_after_days > 0) {
@@ -557,7 +565,7 @@ class MBMessagesManager {
         fun showLocal(context: Context, channel_id: String, small_icon: Int, message_id: Long,
                       title: String?, body: String?, repeat: Int) {
 
-            if (!canShow(context, message_id, repeat)) {
+            if (!canShow(context, message_id, repeat, null)) {
                 return
             }
 
